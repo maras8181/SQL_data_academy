@@ -29,7 +29,7 @@ JOIN czechia_payroll cpay
 	ON YEAR(cpri.date_from) = cpay.payroll_year
 JOIN czechia_payroll_industry_branch cpib 
 	ON cpay.industry_branch_code = cpib.code
-WHERE cpay.value_type_code = 5958)
+WHERE cpay.value_type_code = 5958);
 
 CREATE OR REPLACE INDEX i_category_code ON t_martin_mrazek_project_SQL_primary_final(category_code);
 CREATE OR REPLACE INDEX i_date_from_month ON t_martin_mrazek_project_SQL_primary_final(entry_month); 
@@ -53,7 +53,7 @@ SELECT
 	tmm.entry_year
 FROM t_martin_mrazek_project_SQL_primary_final tmm
 GROUP BY tmm.category_code, tmm.entry_year, tmm.entry_month
-ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month)
+ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month);
 
 SELECT 
 	rt3.category_code,
@@ -69,13 +69,15 @@ FROM
 			sum(rt1.percentage) AS sum_of_year_percentage,
 			rt1.entry_year
 		FROM 
-			(SELECT 
-				*,
-				CASE 
-					WHEN vmmt3.category_code = vmmt3.category_code_prev_row THEN
-						(100 - (vmmt3.avg_value_in_month_prev_row / vmmt3.avg_value_in_month * 100))
-					ELSE 0
-				END AS percentage
-			FROM v_martin_mrazek_task_3 vmmt3) AS rt1
+		(SELECT 
+			*,
+			CASE 
+				WHEN vmmt3.category_code = vmmt3.category_code_prev_row THEN
+					(100 - (vmmt3.avg_value_in_month_prev_row / vmmt3.avg_value_in_month * 100))
+				ELSE 0
+			END AS percentage
+		FROM v_martin_mrazek_task_3 vmmt3) AS rt1
 	GROUP BY rt1.category_code, rt1.entry_year) AS rt2
 GROUP BY rt2.category_code) AS rt3
+ORDER BY rt3.avg_year_increasing
+LIMIT 1;
