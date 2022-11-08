@@ -147,3 +147,56 @@ FROM
 GROUP BY rt2.category_code) AS rt3
 ORDER BY rt3.avg_year_increasing
 LIMIT 1;
+
+/*
+ * 4. Existuje rok, ve kterém byl meziroční nárůst cen potravin výrazně vyšší než růst mezd (větší než 10 %)?
+ */
+
+CREATE OR REPLACE VIEW v_martin_mrazek_task_4 AS 
+(SELECT 
+	DISTINCT tmm.cprice_id,
+	tmm.category_code,
+	tmm.cpc_name,
+	tmm.cprice_value,
+	tmm.entry_month,
+	tmm.entry_year 
+FROM t_martin_mrazek_project_sql_primary_final tmm
+ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month);
+
+SELECT 
+	round(rt4.avg_value_in_year, 2) AS avg_value_in_year,
+	rt4.entry_year,
+	round(rt4.year_percentage, 2) AS year_percentage
+FROM 
+	(SELECT 
+		*,
+		CASE 
+			WHEN rt3.avg_value_in_year_prev_row IS NULL THEN 0
+			ELSE (100 - (rt3.avg_value_in_year_prev_row / rt3.avg_value_in_year * 100))
+		END AS year_percentage	
+	FROM 
+		(SELECT 
+			avg(rt2.avg_value_in_year_period) AS avg_value_in_year,
+			lag(avg(rt2.avg_value_in_year_period))
+				OVER (ORDER BY rt2.entry_year) AS avg_value_in_year_prev_row,
+			rt2.entry_year
+		FROM 
+			(SELECT 
+				rt1.category_code,
+				rt1.cpc_name AS name,
+				avg(rt1.cprice_value) AS avg_value_in_year_period,
+				rt1.entry_year,
+				rt1.year_period
+			FROM 
+				(SELECT 
+					vmmt4.*,
+					CASE
+						WHEN vmmt4.entry_month < 4 THEN 1
+						WHEN vmmt4.entry_month < 7 THEN 2
+						WHEN vmmt4.entry_month < 10 THEN 3
+						ELSE 4
+					END AS year_period
+				FROM v_martin_mrazek_task_4 vmmt4) AS rt1
+			GROUP BY rt1.category_code, rt1.entry_year
+			ORDER BY rt1.category_code, rt1.entry_year) AS rt2
+		GROUP BY rt2.entry_year) AS rt3) AS rt4;
