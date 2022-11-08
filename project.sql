@@ -101,7 +101,6 @@ FROM
 		GROUP BY rt2.industry_branch_code, rt2.time_range) AS rt3
 	WHERE rt3.industry_branch_code = rt3.industry_branch_code_prev_row;
 
-
 /*
  * 3. Která kategorie potravin zdražuje nejpomaleji (je u ní nejnižší percentuální meziroční 
  * nárůst)?
