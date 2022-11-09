@@ -102,6 +102,104 @@ FROM
 	WHERE rt3.industry_branch_code = rt3.industry_branch_code_prev_row;
 
 /*
+ * Kolik je možné si koupit litrů mléka a kilogramů chleba za první a poslední srovnatelné období v dostupných datech cen a mezd? 
+ */
+
+
+CREATE OR REPLACE TABLE t_avg_wages_in_first_last_period AS 
+	(SELECT 
+		rt1.date_from AS first_last_period,
+		round(avg(rt1.cpayroll_value), 2) AS avg_wage_in_period,
+		rt1.payroll_year
+	FROM 
+		(SELECT 
+			DISTINCT tmm2.cpayroll_id,
+			tmm2.cpib_name,
+			tmm2.cpayroll_value,
+			tmm2.date_from,
+			tmm2.payroll_year
+		FROM t_martin_mrazek_project_sql_primary_final tmm2
+		WHERE tmm2.date_from = (
+			SELECT 
+				tmm.date_from
+			FROM t_martin_mrazek_project_sql_primary_final tmm
+			ORDER BY tmm.date_from 
+			LIMIT 1
+		)
+		OR tmm2.date_from = (
+			SELECT 
+				tmm.date_from
+			FROM t_martin_mrazek_project_sql_primary_final tmm
+			ORDER BY tmm.date_from DESC
+			LIMIT 1 )) AS rt1
+		GROUP BY rt1.date_from);
+
+CREATE OR REPLACE VIEW v_martin_mrazek_task_2 AS 
+	(SELECT 
+		DISTINCT tmm.cprice_id,
+		tmm.category_code,
+		tmm.cpc_name,
+		tmm.cprice_value,
+		tmm.date_from,
+		tmm.date_to,
+		tmm.price_value,
+		tmm.price_unit,
+		taw.first_last_period,
+		taw.avg_wage_in_period,
+		taw.payroll_year
+	FROM t_martin_mrazek_project_sql_primary_final tmm
+	JOIN t_avg_wages_in_first_last_period taw
+		ON tmm.date_from = taw.first_last_period
+	WHERE tmm.date_from = (
+		SELECT 
+			tmm.date_from
+		FROM t_martin_mrazek_project_sql_primary_final tmm
+		ORDER BY tmm.date_from 
+		LIMIT 1
+	)
+	OR tmm.date_from = (
+		SELECT 
+			tmm.date_from
+		FROM t_martin_mrazek_project_sql_primary_final tmm
+		ORDER BY tmm.date_from DESC
+		LIMIT 1
+	));
+
+
+SELECT 
+	rt2.category_code,
+	rt2.name,
+	rt2.avg_wage_in_period,
+	rt2.avg_value,
+	round(rt2.avg_wage_in_period / rt2.avg_value) can_be_purchased,
+	rt2.date_from,
+	rt2.date_to
+FROM 
+	(SELECT 
+		rt1.category_code,
+		rt1.name,
+		round(avg(rt1.value), 2) AS avg_value,
+		rt1.price_value,
+		rt1.price_unit,
+		rt1.date_from,
+		rt1.date_to,
+		rt1.avg_wage_in_period
+	FROM 
+		(SELECT 
+			vmmt2.category_code,
+			vmmt2.cpc_name AS name,
+			vmmt2.cprice_value AS value,
+			vmmt2.price_value,
+			vmmt2.price_unit,
+			vmmt2.date_from,
+			vmmt2.date_to,
+			vmmt2.payroll_year,
+			vmmt2.avg_wage_in_period
+		FROM v_martin_mrazek_task_2 vmmt2
+		WHERE vmmt2.category_code IN (111301, 114201)) AS rt1
+	GROUP BY rt1.category_code, rt1.date_from, rt1.avg_wage_in_period) AS rt2;
+
+/*
  * 3. Která kategorie potravin zdražuje nejpomaleji (je u ní nejnižší percentuální meziroční 
  * nárůst)?
  */
