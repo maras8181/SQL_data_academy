@@ -298,3 +298,107 @@ FROM
 			GROUP BY rt1.category_code, rt1.entry_year
 			ORDER BY rt1.category_code, rt1.entry_year) AS rt2
 		GROUP BY rt2.entry_year) AS rt3) AS rt4;
+
+/*
+ * Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, 
+ * pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách 
+ * ve stejném nebo násdujícím roce výraznějším růstem?
+ */
+
+CREATE OR REPLACE TABLE t_martin_mrazek_project_SQL_secondary_final AS 
+(SELECT 
+	c.country,
+	c.continent,
+	e.YEAR,
+	e.population,
+	e.GDP,
+	e.gini
+FROM countries c 
+JOIN economies e 
+	ON c.country = e.country
+WHERE c.continent = 'Europe'
+AND e.YEAR IN (
+	SELECT 
+		DISTINCT tmm.entry_year
+	FROM t_martin_mrazek_project_sql_primary_final tmm
+	ORDER BY tmm.entry_year)
+);
+
+CREATE OR REPLACE VIEW v_martin_mrazek_task_5_prices AS 
+(SELECT 
+	avg(pr.cprice_value) AS avg_price_in_year,
+	lag(avg(pr.cprice_value))
+		OVER (ORDER BY pr.entry_year) AS avg_price_in_year_prev_row,
+	pr.entry_year
+FROM 
+	(SELECT 
+		DISTINCT tmm.cprice_id,
+		tmm.cprice_value,
+		tmm.entry_year 
+	FROM t_martin_mrazek_project_sql_primary_final tmm
+	ORDER BY tmm.entry_year) AS pr
+GROUP BY pr.entry_year);
+
+CREATE OR REPLACE VIEW v_martin_mrazek_task_5_wages AS 
+(SELECT 
+	avg(wg.cpayroll_value) AS avg_wage_in_year,
+	lag(avg(wg.cpayroll_value))
+		OVER (ORDER BY wg.payroll_year) AS avg_wage_in_year_prev_row,
+	wg.payroll_year
+FROM 
+	(SELECT 
+		DISTINCT tmm.cpayroll_id,
+		tmm.cpayroll_value,
+		tmm.payroll_year
+	FROM t_martin_mrazek_project_sql_primary_final tmm
+	ORDER BY tmm.payroll_year) AS wg
+GROUP BY wg.payroll_year);
+
+SELECT 
+*
+FROM 
+(SELECT 
+	rt3.YEAR,
+	rt3.gdp_percentage,
+	lead(rt3.gdp_percentage)
+		OVER (ORDER BY rt3.YEAR) AS gdp_percentage_prev_row,
+	rt3.price_percentage,
+	lead(rt3.price_percentage)
+		OVER (ORDER BY rt3.YEAR) AS price_percentage_prev_row,
+	lead(rt3.price_percentage, 2)
+		OVER (ORDER BY rt3.YEAR) AS price_percentage_prev_two_row,
+	rt3.wage_percentage,
+	lead(rt3.wage_percentage)
+		OVER (ORDER BY rt3.YEAR) AS wage_percentage_prev_row,
+	lead(rt3.wage_percentage, 2)
+		OVER (ORDER BY rt3.YEAR) AS wage_percentage_prev_two_row
+FROM 
+(SELECT 
+	*,
+	CASE 
+		WHEN rt2.avg_gdp_europe_prev_row IS NOT NULL 
+		THEN (100 - (rt2.avg_gdp_europe_prev_row / rt2.avg_gdp_europe * 100))
+	END AS gdp_percentage,
+	CASE 
+		WHEN rt2.avg_price_in_year_prev_row IS NOT NULL 
+		THEN (100 - (rt2.avg_price_in_year_prev_row / rt2.avg_price_in_year * 100))
+	END AS price_percentage,
+	CASE 
+		WHEN rt2.avg_wage_in_year IS NOT NULL 
+		THEN (100 - (rt2.avg_wage_in_year_prev_row / rt2.avg_wage_in_year * 100))
+	END AS wage_percentage	
+FROM 
+	(SELECT 
+		*
+	FROM 
+		(SELECT 
+			avg(tmm.gdp) AS avg_gdp_europe,
+			lag(avg(tmm.gdp)) 
+				OVER (ORDER BY tmm.YEAR) AS avg_gdp_europe_prev_row,
+			tmm.YEAR
+		FROM t_martin_mrazek_project_SQL_secondary_final tmm
+		GROUP BY tmm.YEAR) AS rt1
+		JOIN v_martin_mrazek_task_5_prices vmmt5p
+			ON rt1.YEAR = vmmt5p.entry_year
+		JOIN v_martin_mrazek_task_5_wages vmmt5w
+			ON rt1.YEAR = vmmt5w.payroll_year) AS rt2) AS rt3) AS rt4;
