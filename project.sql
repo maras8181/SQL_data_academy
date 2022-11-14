@@ -1,35 +1,35 @@
 CREATE OR REPLACE TABLE t_martin_mrazek_project_SQL_primary_final AS 
-(SELECT 
-	cpri.id AS cprice_id,
-	cpri.value AS cprice_value,
-	cpri.category_code,
-	cpri.date_from,
-	cpri.date_to,
-	MONTH(cpri.date_from) AS entry_month,
-	YEAR(cpri.date_from) AS entry_year,
-	cpri.region_code,
-	cpc.code AS cpc_code, 
-	cpc.name AS cpc_name,
-	cpc.price_value,
-	cpc.price_unit,
-	cpay.id AS cpayroll_id,
-	cpay.value AS cpayroll_value,
-	cpay.value_type_code,
-	cpay.unit_code,
-	cpay.calculation_code,
-	cpay.industry_branch_code,
-	cpay.payroll_year,
-	cpay.payroll_quarter,
-	cpib.code AS cpib_code,
-	cpib.name AS cpib_name
-FROM czechia_price cpri
-JOIN czechia_price_category cpc
-	ON cpri.category_code = cpc.code 
-JOIN czechia_payroll cpay 
-	ON YEAR(cpri.date_from) = cpay.payroll_year
-JOIN czechia_payroll_industry_branch cpib 
-	ON cpay.industry_branch_code = cpib.code
-WHERE cpay.value_type_code = 5958);
+	(SELECT 
+		cpri.id AS cprice_id,
+		cpri.value AS cprice_value,
+		cpri.category_code,
+		cpri.date_from,
+		cpri.date_to,
+		MONTH(cpri.date_from) AS entry_month,
+		YEAR(cpri.date_from) AS entry_year,
+		cpri.region_code,
+		cpc.code AS cpc_code, 
+		cpc.name AS cpc_name,
+		cpc.price_value,
+		cpc.price_unit,
+		cpay.id AS cpayroll_id,
+		cpay.value AS cpayroll_value,
+		cpay.value_type_code,
+		cpay.unit_code,
+		cpay.calculation_code,
+		cpay.industry_branch_code,
+		cpay.payroll_year,
+		cpay.payroll_quarter,
+		cpib.code AS cpib_code,
+		cpib.name AS cpib_name
+	FROM czechia_price cpri
+	JOIN czechia_price_category cpc
+		ON cpri.category_code = cpc.code 
+	JOIN czechia_payroll cpay 
+		ON YEAR(cpri.date_from) = cpay.payroll_year
+	JOIN czechia_payroll_industry_branch cpib 
+		ON cpay.industry_branch_code = cpib.code
+	WHERE cpay.value_type_code = 5958);
 
 CREATE OR REPLACE INDEX i_category_code ON t_martin_mrazek_project_SQL_primary_final(category_code);
 CREATE OR REPLACE INDEX i_date_from_month ON t_martin_mrazek_project_SQL_primary_final(entry_month); 
@@ -204,20 +204,20 @@ FROM
  * nárůst)?
  */
 
-CREATE OR REPLACE VIEW v_martin_mrazek_task_3 AS (
-SELECT 
-	DISTINCT tmm.category_code,
-	lag(tmm.category_code) 
-		OVER (ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month) AS category_code_prev_row,
-	tmm.cpc_name,
-	avg(tmm.cprice_value) AS avg_value_in_month,
-	lag(avg(tmm.cprice_value)) 
-		OVER (ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month) AS avg_value_in_month_prev_row,
-	tmm.entry_month,
-	tmm.entry_year
-FROM t_martin_mrazek_project_SQL_primary_final tmm
-GROUP BY tmm.category_code, tmm.entry_year, tmm.entry_month
-ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month);
+CREATE OR REPLACE VIEW v_martin_mrazek_task_3 AS 
+	(SELECT 
+		DISTINCT tmm.category_code,
+		lag(tmm.category_code) 
+			OVER (ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month) AS category_code_prev_row,
+		tmm.cpc_name,
+		avg(tmm.cprice_value) AS avg_value_in_month,
+		lag(avg(tmm.cprice_value)) 
+			OVER (ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month) AS avg_value_in_month_prev_row,
+		tmm.entry_month,
+		tmm.entry_year
+	FROM t_martin_mrazek_project_SQL_primary_final tmm
+	GROUP BY tmm.category_code, tmm.entry_year, tmm.entry_month
+	ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month);
 
 SELECT 
 	rt3.category_code,
@@ -251,15 +251,15 @@ LIMIT 1;
  */
 
 CREATE OR REPLACE VIEW v_martin_mrazek_task_4 AS 
-(SELECT 
-	DISTINCT tmm.cprice_id,
-	tmm.category_code,
-	tmm.cpc_name,
-	tmm.cprice_value,
-	tmm.entry_month,
-	tmm.entry_year 
-FROM t_martin_mrazek_project_sql_primary_final tmm
-ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month);
+	(SELECT 
+		DISTINCT tmm.cprice_id,
+		tmm.category_code,
+		tmm.cpc_name,
+		tmm.cprice_value,
+		tmm.entry_month,
+		tmm.entry_year 
+	FROM t_martin_mrazek_project_sql_primary_final tmm
+	ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month);
 
 SELECT 
 	round(rt4.avg_value_in_year, 2) AS avg_value_in_year,
@@ -306,118 +306,118 @@ FROM
  */
 
 CREATE OR REPLACE TABLE t_martin_mrazek_project_SQL_secondary_final AS 
-(SELECT 
-	c.country,
-	c.continent,
-	e.YEAR,
-	e.population,
-	e.GDP,
-	e.gini
-FROM countries c 
-JOIN economies e 
-	ON c.country = e.country
-WHERE c.continent = 'Europe'
-AND e.YEAR IN (
-	SELECT 
-		DISTINCT tmm.entry_year
-	FROM t_martin_mrazek_project_sql_primary_final tmm
-	ORDER BY tmm.entry_year)
-);
+	(SELECT 
+		c.country,
+		c.continent,
+		e.YEAR,
+		e.population,
+		e.GDP,
+		e.gini
+	FROM countries c 
+	JOIN economies e 
+		ON c.country = e.country
+	WHERE c.continent = 'Europe'
+	AND e.YEAR IN (
+		SELECT 
+			DISTINCT tmm.entry_year
+		FROM t_martin_mrazek_project_sql_primary_final tmm
+		ORDER BY tmm.entry_year)
+	);
 
 CREATE OR REPLACE VIEW v_martin_mrazek_task_5_prices AS 
-(SELECT 
-	avg(pr.cprice_value) AS avg_price_in_year,
-	lag(avg(pr.cprice_value))
-		OVER (ORDER BY pr.entry_year) AS avg_price_in_year_prev_row,
-	pr.entry_year
-FROM 
 	(SELECT 
-		DISTINCT tmm.cprice_id,
-		tmm.cprice_value,
-		tmm.entry_year 
-	FROM t_martin_mrazek_project_sql_primary_final tmm
-	ORDER BY tmm.entry_year) AS pr
-GROUP BY pr.entry_year);
+		avg(pr.cprice_value) AS avg_price_in_year,
+		lag(avg(pr.cprice_value))
+			OVER (ORDER BY pr.entry_year) AS avg_price_in_year_prev_row,
+		pr.entry_year
+	FROM 
+		(SELECT 
+			DISTINCT tmm.cprice_id,
+			tmm.cprice_value,
+			tmm.entry_year 
+		FROM t_martin_mrazek_project_sql_primary_final tmm
+		ORDER BY tmm.entry_year) AS pr
+	GROUP BY pr.entry_year);
 
 CREATE OR REPLACE VIEW v_martin_mrazek_task_5_wages AS 
-(SELECT 
-	avg(wg.cpayroll_value) AS avg_wage_in_year,
-	lag(avg(wg.cpayroll_value))
-		OVER (ORDER BY wg.payroll_year) AS avg_wage_in_year_prev_row,
-	wg.payroll_year
-FROM 
 	(SELECT 
-		DISTINCT tmm.cpayroll_id,
-		tmm.cpayroll_value,
-		tmm.payroll_year
-	FROM t_martin_mrazek_project_sql_primary_final tmm
-	ORDER BY tmm.payroll_year) AS wg
-GROUP BY wg.payroll_year);
+		avg(wg.cpayroll_value) AS avg_wage_in_year,
+		lag(avg(wg.cpayroll_value))
+			OVER (ORDER BY wg.payroll_year) AS avg_wage_in_year_prev_row,
+		wg.payroll_year
+	FROM 
+		(SELECT 
+			DISTINCT tmm.cpayroll_id,
+			tmm.cpayroll_value,
+			tmm.payroll_year
+		FROM t_martin_mrazek_project_sql_primary_final tmm
+		ORDER BY tmm.payroll_year) AS wg
+	GROUP BY wg.payroll_year);
 
 SELECT 
 	rt5.YEAR,
 	rt5.increasing_of_next_year,
 	rt5.increasing_of_second_year
 FROM 
-(SELECT 
-	*,
-	CASE 
-		WHEN rt4.gdp_percentage IS NULL AND rt4.gdp_percentage_prev_row IS NULL THEN 
-			'HDP: 0.00 (0 %) - PRICE: 0.00 (0 %) - WAGE: 0.00 (0 %)'
-		WHEN rt4.gdp_percentage IS NOT NULL AND rt4.gdp_percentage_prev_row IS NULL THEN 
-			concat('HDP: ', round((rt4.gdp_percentage), 2), ' (100 %) - PRICE: ', round((rt4.price_percentage), 2), ' (100 %) - WAGE: ', round((rt4.wage_percentage), 2), ' (100 %)')
-		ELSE concat('HDP: ', round((rt4.gdp_percentage), 2), ' (', round((rt4.gdp_percentage - rt4.gdp_percentage_prev_row), 2),  ' %) - PRICE: ', round((rt4.price_percentage), 2), ' (', round((rt4.price_percentage - rt4.price_percentage_prev_row), 2),  ' %) - WAGE: ', round((rt4.wage_percentage), 2), ' (', round((rt4.wage_percentage - rt4.wage_percentage_prev_row), 2),  ' %)')
-	END AS increasing_of_next_year,
-	CASE 
-		WHEN rt4.gdp_percentage IS NULL AND rt4.gdp_percentage_prev_row IS NULL THEN 
-			'HDP: 0.00 (0 %) - PRICE: 0.00 (0 %) - WAGE: 0.00 (0 %)'
-		WHEN rt4.gdp_percentage IS NOT NULL AND rt4.gdp_percentage_prev_row IS NULL THEN 
-			concat('HDP: ', round((rt4.gdp_percentage), 2), ' (100 %) - PRICE: ', round((rt4.price_percentage), 2), ' (100 %) - WAGE: ', round((rt4.wage_percentage), 2), ' (100 %)')
-		ELSE concat('HDP: ', round((rt4.gdp_percentage), 2), ' (', round((rt4.gdp_percentage - rt4.gdp_percentage_prev_row), 2),  ' %) - PRICE: ', round((rt4.price_percentage_foll_row), 2), ' (', round((rt4.price_percentage_foll_row - rt4.price_percentage_prev_row), 2),  ' %) - WAGE: ', round((rt4.wage_percentage_foll_row), 2), ' (', round((rt4.wage_percentage_foll_row - rt4.wage_percentage_prev_row), 2),  ' %)')
-	END AS increasing_of_second_year
-FROM 
-(SELECT 
-	rt3.YEAR,
-	rt3.gdp_percentage,
-	lag(rt3.gdp_percentage)
-		OVER (ORDER BY rt3.year) AS gdp_percentage_prev_row,
-	rt3.price_percentage,
-	lag(rt3.price_percentage)
-		OVER (ORDER BY rt3.year) AS price_percentage_prev_row,
-	lead(rt3.price_percentage)
-		OVER (ORDER BY rt3.year) AS price_percentage_foll_row,
-	rt3.wage_percentage,
-	lag(rt3.wage_percentage)
-		OVER (ORDER BY rt3.year) AS wage_percentage_prev_row,
-	lead(rt3.wage_percentage)
-		OVER (ORDER BY rt3.year) AS wage_percentage_foll_row
-FROM 
-(SELECT 
-	*,
-	CASE 
-		WHEN rt2.avg_gdp_europe_prev_row IS NOT NULL 
-		THEN (100 - (rt2.avg_gdp_europe_prev_row / rt2.avg_gdp_europe * 100))
-	END AS gdp_percentage,
-	CASE 
-		WHEN rt2.avg_price_in_year_prev_row IS NOT NULL 
-		THEN (100 - (rt2.avg_price_in_year_prev_row / rt2.avg_price_in_year * 100))
-	END AS price_percentage,
-	CASE 
-		WHEN rt2.avg_wage_in_year IS NOT NULL 
-		THEN (100 - (rt2.avg_wage_in_year_prev_row / rt2.avg_wage_in_year * 100))
-	END AS wage_percentage	
-FROM 
-(SELECT 
-	*
-FROM 
 	(SELECT 
-		avg(tmm.gdp) AS avg_gdp_europe,
-		lag(avg(tmm.gdp)) 
-			OVER (ORDER BY tmm.YEAR) AS avg_gdp_europe_prev_row,
-		tmm.YEAR
-	FROM t_martin_mrazek_project_SQL_secondary_final tmm
-	GROUP BY tmm.YEAR) AS rt1
-	JOIN v_martin_mrazek_task_5_prices vmmt5p
-		ON rt1.YEAR = vmmt5p.entry_year
-	JOIN v_martin_mrazek_task_5_wages vmmt5w
-		ON rt1.YEAR = vmmt5w.payroll_year) AS rt2) AS rt3) AS rt4) AS rt5;
+		*,
+		CASE 
+			WHEN rt4.gdp_percentage IS NULL AND rt4.gdp_percentage_prev_row IS NULL THEN 
+				'HDP: 0.00 (0 %) - PRICE: 0.00 (0 %) - WAGE: 0.00 (0 %)'
+			WHEN rt4.gdp_percentage IS NOT NULL AND rt4.gdp_percentage_prev_row IS NULL THEN 
+				concat('HDP: ', round((rt4.gdp_percentage), 2), ' (100 %) - PRICE: ', round((rt4.price_percentage), 2), ' (100 %) - WAGE: ', round((rt4.wage_percentage), 2), ' (100 %)')
+			ELSE concat('HDP: ', round((rt4.gdp_percentage), 2), ' (', round((rt4.gdp_percentage - rt4.gdp_percentage_prev_row), 2),  ' %) - PRICE: ', round((rt4.price_percentage), 2), ' (', round((rt4.price_percentage - rt4.price_percentage_prev_row), 2),  ' %) - WAGE: ', round((rt4.wage_percentage), 2), ' (', round((rt4.wage_percentage - rt4.wage_percentage_prev_row), 2),  ' %)')
+		END AS increasing_of_next_year,
+		CASE 
+			WHEN rt4.gdp_percentage IS NULL AND rt4.gdp_percentage_prev_row IS NULL THEN 
+				'HDP: 0.00 (0 %) - PRICE: 0.00 (0 %) - WAGE: 0.00 (0 %)'
+			WHEN rt4.gdp_percentage IS NOT NULL AND rt4.gdp_percentage_prev_row IS NULL THEN 
+				concat('HDP: ', round((rt4.gdp_percentage), 2), ' (100 %) - PRICE: ', round((rt4.price_percentage), 2), ' (100 %) - WAGE: ', round((rt4.wage_percentage), 2), ' (100 %)')
+			ELSE concat('HDP: ', round((rt4.gdp_percentage), 2), ' (', round((rt4.gdp_percentage - rt4.gdp_percentage_prev_row), 2),  ' %) - PRICE: ', round((rt4.price_percentage_foll_row), 2), ' (', round((rt4.price_percentage_foll_row - rt4.price_percentage_prev_row), 2),  ' %) - WAGE: ', round((rt4.wage_percentage_foll_row), 2), ' (', round((rt4.wage_percentage_foll_row - rt4.wage_percentage_prev_row), 2),  ' %)')
+		END AS increasing_of_second_year
+	FROM 
+		(SELECT 
+			rt3.YEAR,
+			rt3.gdp_percentage,
+			lag(rt3.gdp_percentage)
+				OVER (ORDER BY rt3.year) AS gdp_percentage_prev_row,
+			rt3.price_percentage,
+			lag(rt3.price_percentage)
+				OVER (ORDER BY rt3.year) AS price_percentage_prev_row,
+			lead(rt3.price_percentage)
+				OVER (ORDER BY rt3.year) AS price_percentage_foll_row,
+			rt3.wage_percentage,
+			lag(rt3.wage_percentage)
+				OVER (ORDER BY rt3.year) AS wage_percentage_prev_row,
+			lead(rt3.wage_percentage)
+				OVER (ORDER BY rt3.year) AS wage_percentage_foll_row
+		FROM 
+			(SELECT 
+				*,
+				CASE 
+					WHEN rt2.avg_gdp_europe_prev_row IS NOT NULL 
+					THEN (100 - (rt2.avg_gdp_europe_prev_row / rt2.avg_gdp_europe * 100))
+				END AS gdp_percentage,
+				CASE 
+					WHEN rt2.avg_price_in_year_prev_row IS NOT NULL 
+					THEN (100 - (rt2.avg_price_in_year_prev_row / rt2.avg_price_in_year * 100))
+				END AS price_percentage,
+				CASE 
+					WHEN rt2.avg_wage_in_year IS NOT NULL 
+					THEN (100 - (rt2.avg_wage_in_year_prev_row / rt2.avg_wage_in_year * 100))
+				END AS wage_percentage	
+			FROM 
+				(SELECT 
+					*
+				FROM 
+					(SELECT 
+						avg(tmm.gdp) AS avg_gdp_europe,
+						lag(avg(tmm.gdp)) 
+							OVER (ORDER BY tmm.YEAR) AS avg_gdp_europe_prev_row,
+						tmm.YEAR
+					FROM t_martin_mrazek_project_SQL_secondary_final tmm
+					GROUP BY tmm.YEAR) AS rt1
+					JOIN v_martin_mrazek_task_5_prices vmmt5p
+						ON rt1.YEAR = vmmt5p.entry_year
+					JOIN v_martin_mrazek_task_5_wages vmmt5w
+						ON rt1.YEAR = vmmt5w.payroll_year) AS rt2) AS rt3) AS rt4) AS rt5;
