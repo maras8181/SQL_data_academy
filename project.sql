@@ -355,23 +355,42 @@ FROM
 GROUP BY wg.payroll_year);
 
 SELECT 
-*
+	rt5.YEAR,
+	rt5.increasing_of_next_year,
+	rt5.increasing_of_second_year
+FROM 
+(SELECT 
+	*,
+	CASE 
+		WHEN rt4.gdp_percentage IS NULL AND rt4.gdp_percentage_prev_row IS NULL THEN 
+			'HDP: 0.00 (0 %) - PRICE: 0.00 (0 %) - WAGE: 0.00 (0 %)'
+		WHEN rt4.gdp_percentage IS NOT NULL AND rt4.gdp_percentage_prev_row IS NULL THEN 
+			concat('HDP: ', round((rt4.gdp_percentage), 2), ' (100 %) - PRICE: ', round((rt4.price_percentage), 2), ' (100 %) - WAGE: ', round((rt4.wage_percentage), 2), ' (100 %)')
+		ELSE concat('HDP: ', round((rt4.gdp_percentage), 2), ' (', round((rt4.gdp_percentage - rt4.gdp_percentage_prev_row), 2),  ' %) - PRICE: ', round((rt4.price_percentage), 2), ' (', round((rt4.price_percentage - rt4.price_percentage_prev_row), 2),  ' %) - WAGE: ', round((rt4.wage_percentage), 2), ' (', round((rt4.wage_percentage - rt4.wage_percentage_prev_row), 2),  ' %)')
+	END AS increasing_of_next_year,
+	CASE 
+		WHEN rt4.gdp_percentage IS NULL AND rt4.gdp_percentage_prev_row IS NULL THEN 
+			'HDP: 0.00 (0 %) - PRICE: 0.00 (0 %) - WAGE: 0.00 (0 %)'
+		WHEN rt4.gdp_percentage IS NOT NULL AND rt4.gdp_percentage_prev_row IS NULL THEN 
+			concat('HDP: ', round((rt4.gdp_percentage), 2), ' (100 %) - PRICE: ', round((rt4.price_percentage), 2), ' (100 %) - WAGE: ', round((rt4.wage_percentage), 2), ' (100 %)')
+		ELSE concat('HDP: ', round((rt4.gdp_percentage), 2), ' (', round((rt4.gdp_percentage - rt4.gdp_percentage_prev_row), 2),  ' %) - PRICE: ', round((rt4.price_percentage_foll_row), 2), ' (', round((rt4.price_percentage_foll_row - rt4.price_percentage_prev_row), 2),  ' %) - WAGE: ', round((rt4.wage_percentage_foll_row), 2), ' (', round((rt4.wage_percentage_foll_row - rt4.wage_percentage_prev_row), 2),  ' %)')
+	END AS increasing_of_second_year
 FROM 
 (SELECT 
 	rt3.YEAR,
 	rt3.gdp_percentage,
-	lead(rt3.gdp_percentage)
-		OVER (ORDER BY rt3.YEAR) AS gdp_percentage_prev_row,
+	lag(rt3.gdp_percentage)
+		OVER (ORDER BY rt3.year) AS gdp_percentage_prev_row,
 	rt3.price_percentage,
+	lag(rt3.price_percentage)
+		OVER (ORDER BY rt3.year) AS price_percentage_prev_row,
 	lead(rt3.price_percentage)
-		OVER (ORDER BY rt3.YEAR) AS price_percentage_prev_row,
-	lead(rt3.price_percentage, 2)
-		OVER (ORDER BY rt3.YEAR) AS price_percentage_prev_two_row,
+		OVER (ORDER BY rt3.year) AS price_percentage_foll_row,
 	rt3.wage_percentage,
+	lag(rt3.wage_percentage)
+		OVER (ORDER BY rt3.year) AS wage_percentage_prev_row,
 	lead(rt3.wage_percentage)
-		OVER (ORDER BY rt3.YEAR) AS wage_percentage_prev_row,
-	lead(rt3.wage_percentage, 2)
-		OVER (ORDER BY rt3.YEAR) AS wage_percentage_prev_two_row
+		OVER (ORDER BY rt3.year) AS wage_percentage_foll_row
 FROM 
 (SELECT 
 	*,
@@ -388,17 +407,17 @@ FROM
 		THEN (100 - (rt2.avg_wage_in_year_prev_row / rt2.avg_wage_in_year * 100))
 	END AS wage_percentage	
 FROM 
+(SELECT 
+	*
+FROM 
 	(SELECT 
-		*
-	FROM 
-		(SELECT 
-			avg(tmm.gdp) AS avg_gdp_europe,
-			lag(avg(tmm.gdp)) 
-				OVER (ORDER BY tmm.YEAR) AS avg_gdp_europe_prev_row,
-			tmm.YEAR
-		FROM t_martin_mrazek_project_SQL_secondary_final tmm
-		GROUP BY tmm.YEAR) AS rt1
-		JOIN v_martin_mrazek_task_5_prices vmmt5p
-			ON rt1.YEAR = vmmt5p.entry_year
-		JOIN v_martin_mrazek_task_5_wages vmmt5w
-			ON rt1.YEAR = vmmt5w.payroll_year) AS rt2) AS rt3) AS rt4;
+		avg(tmm.gdp) AS avg_gdp_europe,
+		lag(avg(tmm.gdp)) 
+			OVER (ORDER BY tmm.YEAR) AS avg_gdp_europe_prev_row,
+		tmm.YEAR
+	FROM t_martin_mrazek_project_SQL_secondary_final tmm
+	GROUP BY tmm.YEAR) AS rt1
+	JOIN v_martin_mrazek_task_5_prices vmmt5p
+		ON rt1.YEAR = vmmt5p.entry_year
+	JOIN v_martin_mrazek_task_5_wages vmmt5w
+		ON rt1.YEAR = vmmt5w.payroll_year) AS rt2) AS rt3) AS rt4) AS rt5;
