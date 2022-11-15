@@ -5,14 +5,14 @@
 
 **2. Kolik je možné si koupit litrů mléka a kilogramů chleba za první a poslední srovnatelné období v dostupných datech cen a mezd?**
   * První srovnatelné období (02-01-2006 - 08-01-2006):
-      *V tomto období byla průměrná mzda (vypočítána ze všech dostupných odvětví) 20.753,78 Kč.
+      <sub>V tomto období byla průměrná mzda (vypočítána ze všech dostupných odvětví) 20.753,78 Kč.
       Průměrná cena za 1 kg chleba v tomhle období byla 14,9 Kč a za 1 litr mléka 14,27 Kč.
-      V případě, že by člověk pobírající tuhle průměrnou mzdu nakoupil pouze chleba a mléko, mohl by si koupit 1393 kg chleba a 1454 litrů mléka.*
+      V případě, že by člověk pobírající tuhle průměrnou mzdu nakoupil pouze chleba a mléko, mohl by si koupit 1393 kg chleba a 1454 litrů mléka.</sub>
    
   * Poslední srovnatelné období (10-12-2018 - 16-12-2018):
-      *V tomto období byla průměrná mzda (vypočítána ze všech dostupných odvětví) 32.535,86 Kč. 
+      <sub>V tomto období byla průměrná mzda (vypočítána ze všech dostupných odvětví) 32.535,86 Kč. 
       Průměrná cena za 1 kg chleba v tomhle období byla 24,74 Kč a za 1 litr mléka 19,55 Kč.
-      V případě, že by člověk pobírající tuhle průměrnou mzdu nakoupil pouze chleba a mléko, mohl by si koupit 1315 kg chleba a 1664 litrů mléka.*
+      V případě, že by člověk pobírající tuhle průměrnou mzdu nakoupil pouze chleba a mléko, mohl by si koupit 1315 kg chleba a 1664 litrů mléka.</sub>
    
 - Odpověď: Za první srovnatelné období je možné si koupit 1393 kg chleba a 1454 litrů mléka. 
            Za poslední srovnatelné období je možné si koupit 1315 kg chleba a 1664 litrů mléka.
