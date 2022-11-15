@@ -175,6 +175,8 @@ CREATE OR REPLACE VIEW v_martin_mrazek_task_4 AS
 
 /* Question (VIEW) 5 */
 
+-- VIEW 5.1
+
 CREATE OR REPLACE VIEW v_martin_mrazek_task_5_prices AS 
 	(SELECT 
 		avg(pr.cprice_value) AS avg_price_in_year,
@@ -190,6 +192,8 @@ CREATE OR REPLACE VIEW v_martin_mrazek_task_5_prices AS
 		ORDER BY tmm.entry_year) AS pr
 	GROUP BY pr.entry_year);
 
+-- VIEW 5.2
+
 CREATE OR REPLACE VIEW v_martin_mrazek_task_5_wages AS 
 	(SELECT 
 		avg(wg.cpayroll_value) AS avg_wage_in_year,
@@ -204,7 +208,6 @@ CREATE OR REPLACE VIEW v_martin_mrazek_task_5_wages AS
 		FROM t_martin_mrazek_project_sql_primary_final tmm
 		ORDER BY tmm.payroll_year) AS wg
 	GROUP BY wg.payroll_year);
-
 
 
 /* QUESTIONS TO BE WORKED OUT */ 
@@ -299,8 +302,7 @@ FROM
 	GROUP BY rt1.category_code, rt1.date_from, rt1.avg_wage_in_period) AS rt2;
 
 /*
- * 3. Která kategorie potravin zdražuje nejpomaleji (je u ní nejnižší percentuální meziroční 
- * nárůst)?
+ * 3. Která kategorie potravin zdražuje nejpomaleji (je u ní nejnižší percentuální meziroční nárůst)?
  */
 
 SELECT 
@@ -373,9 +375,7 @@ FROM
 		GROUP BY rt2.entry_year) AS rt3) AS rt4;
 
 /*
- * Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, 
- * pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách 
- * ve stejném nebo násdujícím roce výraznějším růstem?
+ * Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách ve stejném nebo násdujícím roce výraznějším růstem?
  */
 
 SELECT 
