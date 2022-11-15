@@ -1,3 +1,5 @@
+/* PRIMARY TABLE */
+
 CREATE OR REPLACE TABLE t_martin_mrazek_project_SQL_primary_final AS 
 	(SELECT 
 		cpri.id AS cprice_id,
@@ -31,12 +33,37 @@ CREATE OR REPLACE TABLE t_martin_mrazek_project_SQL_primary_final AS
 		ON cpay.industry_branch_code = cpib.code
 	WHERE cpay.value_type_code = 5958);
 
+/* SECONDARY TABLE */ 
+
+CREATE OR REPLACE TABLE t_martin_mrazek_project_SQL_secondary_final AS 
+	(SELECT 
+		c.country,
+		c.continent,
+		e.YEAR,
+		e.population,
+		e.GDP,
+		e.gini
+	FROM countries c 
+	JOIN economies e 
+		ON c.country = e.country
+	WHERE c.continent = 'Europe'
+	AND e.YEAR IN (
+		SELECT 
+			DISTINCT tmm.entry_year
+		FROM t_martin_mrazek_project_sql_primary_final tmm
+		ORDER BY tmm.entry_year)
+	);
+
+/* INDEXES */
+
 CREATE OR REPLACE INDEX i_category_code ON t_martin_mrazek_project_SQL_primary_final(category_code);
 CREATE OR REPLACE INDEX i_date_from_month ON t_martin_mrazek_project_SQL_primary_final(entry_month); 
 CREATE OR REPLACE INDEX i_date_from_year ON t_martin_mrazek_project_SQL_primary_final(entry_year); 
 CREATE OR REPLACE INDEX i_industry_branch_code ON t_martin_mrazek_project_SQL_primary_final(industry_branch_code); 
 CREATE OR REPLACE INDEX i_payroll_year ON t_martin_mrazek_project_SQL_primary_final(payroll_year); 
 CREATE OR REPLACE INDEX i_payroll_quarter ON t_martin_mrazek_project_SQL_primary_final(payroll_quarter);
+
+/* QUESTIONS TO BE WORKED OUT */ 
 
 /*
  * 1. Rostou v průběhu let mzdy ve všech odvětvích, nebo v některých klesají? 
@@ -105,7 +132,6 @@ FROM
  * Kolik je možné si koupit litrů mléka a kilogramů chleba za první a poslední srovnatelné období v dostupných datech cen a mezd? 
  */
 
-
 CREATE OR REPLACE TABLE t_avg_wages_in_first_last_period AS 
 	(SELECT 
 		rt1.date_from AS first_last_period,
@@ -164,7 +190,6 @@ CREATE OR REPLACE VIEW v_martin_mrazek_task_2 AS
 		ORDER BY tmm.date_from DESC
 		LIMIT 1
 	));
-
 
 SELECT 
 	rt2.category_code,
@@ -304,25 +329,6 @@ FROM
  * pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách 
  * ve stejném nebo násdujícím roce výraznějším růstem?
  */
-
-CREATE OR REPLACE TABLE t_martin_mrazek_project_SQL_secondary_final AS 
-	(SELECT 
-		c.country,
-		c.continent,
-		e.YEAR,
-		e.population,
-		e.GDP,
-		e.gini
-	FROM countries c 
-	JOIN economies e 
-		ON c.country = e.country
-	WHERE c.continent = 'Europe'
-	AND e.YEAR IN (
-		SELECT 
-			DISTINCT tmm.entry_year
-		FROM t_martin_mrazek_project_sql_primary_final tmm
-		ORDER BY tmm.entry_year)
-	);
 
 CREATE OR REPLACE VIEW v_martin_mrazek_task_5_prices AS 
 	(SELECT 
