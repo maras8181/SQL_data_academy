@@ -63,11 +63,11 @@ CREATE OR REPLACE INDEX i_industry_branch_code ON t_martin_mrazek_project_SQL_pr
 CREATE OR REPLACE INDEX i_payroll_year ON t_martin_mrazek_project_SQL_primary_final(payroll_year); 
 CREATE OR REPLACE INDEX i_payroll_quarter ON t_martin_mrazek_project_SQL_primary_final(payroll_quarter);
 
-/* QUESTIONS TO BE WORKED OUT */ 
-
 /*
- * 1. Rostou v průběhu let mzdy ve všech odvětvích, nebo v některých klesají? 
+ * VIEWS AND ADDITIONALS TABLES
  */
+
+/* Question (VIEW) 1 */
 
 CREATE OR REPLACE VIEW v_martin_mrazek_task_1 AS (
 SELECT 
@@ -79,6 +79,139 @@ SELECT
 	tmm.payroll_quarter
 FROM t_martin_mrazek_project_sql_primary_final tmm
 ORDER BY tmm.industry_branch_code, tmm.payroll_year);
+
+/* Question (VIEW) 2 */
+
+CREATE OR REPLACE VIEW v_martin_mrazek_task_2 AS 
+	(SELECT 
+		DISTINCT tmm.cprice_id,
+		tmm.category_code,
+		tmm.cpc_name,
+		tmm.cprice_value,
+		tmm.date_from,
+		tmm.date_to,
+		tmm.price_value,
+		tmm.price_unit,
+		taw.first_last_period,
+		taw.avg_wage_in_period,
+		taw.payroll_year
+	FROM t_martin_mrazek_project_sql_primary_final tmm
+	JOIN t_avg_wages_in_first_last_period taw
+		ON tmm.date_from = taw.first_last_period
+	WHERE tmm.date_from = (
+		SELECT 
+			tmm.date_from
+		FROM t_martin_mrazek_project_sql_primary_final tmm
+		ORDER BY tmm.date_from 
+		LIMIT 1
+	)
+	OR tmm.date_from = (
+		SELECT 
+			tmm.date_from
+		FROM t_martin_mrazek_project_sql_primary_final tmm
+		ORDER BY tmm.date_from DESC
+		LIMIT 1
+	));
+
+-- Additional table
+
+CREATE OR REPLACE TABLE t_avg_wages_in_first_last_period AS 
+	(SELECT 
+		rt1.date_from AS first_last_period,
+		round(avg(rt1.cpayroll_value), 2) AS avg_wage_in_period,
+		rt1.payroll_year
+	FROM 
+		(SELECT 
+			DISTINCT tmm2.cpayroll_id,
+			tmm2.cpib_name,
+			tmm2.cpayroll_value,
+			tmm2.date_from,
+			tmm2.payroll_year
+		FROM t_martin_mrazek_project_sql_primary_final tmm2
+		WHERE tmm2.date_from = (
+			SELECT 
+				tmm.date_from
+			FROM t_martin_mrazek_project_sql_primary_final tmm
+			ORDER BY tmm.date_from 
+			LIMIT 1
+		)
+		OR tmm2.date_from = (
+			SELECT 
+				tmm.date_from
+			FROM t_martin_mrazek_project_sql_primary_final tmm
+			ORDER BY tmm.date_from DESC
+			LIMIT 1 )) AS rt1
+		GROUP BY rt1.date_from);
+
+/* Question (VIEW) 3 */
+
+CREATE OR REPLACE VIEW v_martin_mrazek_task_3 AS 
+	(SELECT 
+		DISTINCT tmm.category_code,
+		lag(tmm.category_code) 
+			OVER (ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month) AS category_code_prev_row,
+		tmm.cpc_name,
+		avg(tmm.cprice_value) AS avg_value_in_month,
+		lag(avg(tmm.cprice_value)) 
+			OVER (ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month) AS avg_value_in_month_prev_row,
+		tmm.entry_month,
+		tmm.entry_year
+	FROM t_martin_mrazek_project_SQL_primary_final tmm
+	GROUP BY tmm.category_code, tmm.entry_year, tmm.entry_month
+	ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month);
+
+/* Question (VIEW) 4 */
+
+CREATE OR REPLACE VIEW v_martin_mrazek_task_4 AS 
+	(SELECT 
+		DISTINCT tmm.cprice_id,
+		tmm.category_code,
+		tmm.cpc_name,
+		tmm.cprice_value,
+		tmm.entry_month,
+		tmm.entry_year 
+	FROM t_martin_mrazek_project_sql_primary_final tmm
+	ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month);
+
+/* Question (VIEW) 5 */
+
+CREATE OR REPLACE VIEW v_martin_mrazek_task_5_prices AS 
+	(SELECT 
+		avg(pr.cprice_value) AS avg_price_in_year,
+		lag(avg(pr.cprice_value))
+			OVER (ORDER BY pr.entry_year) AS avg_price_in_year_prev_row,
+		pr.entry_year
+	FROM 
+		(SELECT 
+			DISTINCT tmm.cprice_id,
+			tmm.cprice_value,
+			tmm.entry_year 
+		FROM t_martin_mrazek_project_sql_primary_final tmm
+		ORDER BY tmm.entry_year) AS pr
+	GROUP BY pr.entry_year);
+
+CREATE OR REPLACE VIEW v_martin_mrazek_task_5_wages AS 
+	(SELECT 
+		avg(wg.cpayroll_value) AS avg_wage_in_year,
+		lag(avg(wg.cpayroll_value))
+			OVER (ORDER BY wg.payroll_year) AS avg_wage_in_year_prev_row,
+		wg.payroll_year
+	FROM 
+		(SELECT 
+			DISTINCT tmm.cpayroll_id,
+			tmm.cpayroll_value,
+			tmm.payroll_year
+		FROM t_martin_mrazek_project_sql_primary_final tmm
+		ORDER BY tmm.payroll_year) AS wg
+	GROUP BY wg.payroll_year);
+
+
+
+/* QUESTIONS TO BE WORKED OUT */ 
+
+/*
+ * 1. Rostou v průběhu let mzdy ve všech odvětvích, nebo v některých klesají? 
+ */
 
 SELECT 
 	rt3.industry_branch_code,
@@ -132,65 +265,6 @@ FROM
  * Kolik je možné si koupit litrů mléka a kilogramů chleba za první a poslední srovnatelné období v dostupných datech cen a mezd? 
  */
 
-CREATE OR REPLACE TABLE t_avg_wages_in_first_last_period AS 
-	(SELECT 
-		rt1.date_from AS first_last_period,
-		round(avg(rt1.cpayroll_value), 2) AS avg_wage_in_period,
-		rt1.payroll_year
-	FROM 
-		(SELECT 
-			DISTINCT tmm2.cpayroll_id,
-			tmm2.cpib_name,
-			tmm2.cpayroll_value,
-			tmm2.date_from,
-			tmm2.payroll_year
-		FROM t_martin_mrazek_project_sql_primary_final tmm2
-		WHERE tmm2.date_from = (
-			SELECT 
-				tmm.date_from
-			FROM t_martin_mrazek_project_sql_primary_final tmm
-			ORDER BY tmm.date_from 
-			LIMIT 1
-		)
-		OR tmm2.date_from = (
-			SELECT 
-				tmm.date_from
-			FROM t_martin_mrazek_project_sql_primary_final tmm
-			ORDER BY tmm.date_from DESC
-			LIMIT 1 )) AS rt1
-		GROUP BY rt1.date_from);
-
-CREATE OR REPLACE VIEW v_martin_mrazek_task_2 AS 
-	(SELECT 
-		DISTINCT tmm.cprice_id,
-		tmm.category_code,
-		tmm.cpc_name,
-		tmm.cprice_value,
-		tmm.date_from,
-		tmm.date_to,
-		tmm.price_value,
-		tmm.price_unit,
-		taw.first_last_period,
-		taw.avg_wage_in_period,
-		taw.payroll_year
-	FROM t_martin_mrazek_project_sql_primary_final tmm
-	JOIN t_avg_wages_in_first_last_period taw
-		ON tmm.date_from = taw.first_last_period
-	WHERE tmm.date_from = (
-		SELECT 
-			tmm.date_from
-		FROM t_martin_mrazek_project_sql_primary_final tmm
-		ORDER BY tmm.date_from 
-		LIMIT 1
-	)
-	OR tmm.date_from = (
-		SELECT 
-			tmm.date_from
-		FROM t_martin_mrazek_project_sql_primary_final tmm
-		ORDER BY tmm.date_from DESC
-		LIMIT 1
-	));
-
 SELECT 
 	rt2.category_code,
 	rt2.name,
@@ -229,21 +303,6 @@ FROM
  * nárůst)?
  */
 
-CREATE OR REPLACE VIEW v_martin_mrazek_task_3 AS 
-	(SELECT 
-		DISTINCT tmm.category_code,
-		lag(tmm.category_code) 
-			OVER (ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month) AS category_code_prev_row,
-		tmm.cpc_name,
-		avg(tmm.cprice_value) AS avg_value_in_month,
-		lag(avg(tmm.cprice_value)) 
-			OVER (ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month) AS avg_value_in_month_prev_row,
-		tmm.entry_month,
-		tmm.entry_year
-	FROM t_martin_mrazek_project_SQL_primary_final tmm
-	GROUP BY tmm.category_code, tmm.entry_year, tmm.entry_month
-	ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month);
-
 SELECT 
 	rt3.category_code,
 	rt3.avg_year_increasing
@@ -274,17 +333,6 @@ LIMIT 1;
 /*
  * 4. Existuje rok, ve kterém byl meziroční nárůst cen potravin výrazně vyšší než růst mezd (větší než 10 %)?
  */
-
-CREATE OR REPLACE VIEW v_martin_mrazek_task_4 AS 
-	(SELECT 
-		DISTINCT tmm.cprice_id,
-		tmm.category_code,
-		tmm.cpc_name,
-		tmm.cprice_value,
-		tmm.entry_month,
-		tmm.entry_year 
-	FROM t_martin_mrazek_project_sql_primary_final tmm
-	ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month);
 
 SELECT 
 	round(rt4.avg_value_in_year, 2) AS avg_value_in_year,
@@ -329,36 +377,6 @@ FROM
  * pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách 
  * ve stejném nebo násdujícím roce výraznějším růstem?
  */
-
-CREATE OR REPLACE VIEW v_martin_mrazek_task_5_prices AS 
-	(SELECT 
-		avg(pr.cprice_value) AS avg_price_in_year,
-		lag(avg(pr.cprice_value))
-			OVER (ORDER BY pr.entry_year) AS avg_price_in_year_prev_row,
-		pr.entry_year
-	FROM 
-		(SELECT 
-			DISTINCT tmm.cprice_id,
-			tmm.cprice_value,
-			tmm.entry_year 
-		FROM t_martin_mrazek_project_sql_primary_final tmm
-		ORDER BY tmm.entry_year) AS pr
-	GROUP BY pr.entry_year);
-
-CREATE OR REPLACE VIEW v_martin_mrazek_task_5_wages AS 
-	(SELECT 
-		avg(wg.cpayroll_value) AS avg_wage_in_year,
-		lag(avg(wg.cpayroll_value))
-			OVER (ORDER BY wg.payroll_year) AS avg_wage_in_year_prev_row,
-		wg.payroll_year
-	FROM 
-		(SELECT 
-			DISTINCT tmm.cpayroll_id,
-			tmm.cpayroll_value,
-			tmm.payroll_year
-		FROM t_martin_mrazek_project_sql_primary_final tmm
-		ORDER BY tmm.payroll_year) AS wg
-	GROUP BY wg.payroll_year);
 
 SELECT 
 	rt5.YEAR,
