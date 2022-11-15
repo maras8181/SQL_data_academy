@@ -25,7 +25,6 @@
 ## 4. Existuje rok, ve kterém byl meziroční nárůst cen potravin výrazně vyšší než růst mezd (větší než 10 %)? ##
 - Odpověď: Tento rok neexistuje. Nejvyšší nárůst potravin byl v roce 2017, kdy cena potravin vzrostla o 8,78 %.
 
-## 5. Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, pokud HDP vzroste výrazněji v jednom roce, 
-## projeví se to na cenách potravin či mzdách ve stejném nebo násdujícím roce výraznějším růstem?
+## 5. Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách ve stejném nebo násdujícím roce výraznějším růstem?
 - Odpověď: Výška HDP vliv na změny ve mzdách a cenách potravin nemá. Jakmile vzroste výrazněji výška HDP (nejvíce o 8 %), pak ve stejném, nebo následujícím roce
             se vzrůst mezd a cen potravin výraznějším růstem neprojeví.
