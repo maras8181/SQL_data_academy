@@ -307,10 +307,12 @@ FROM
 
 SELECT 
 	rt3.category_code,
+	rt3.cpc_name,
 	rt3.avg_year_increasing
 FROM 
 	(SELECT 
 		rt2.category_code,
+		rt2.cpc_name,
 		round(avg(rt2.sum_of_year_percentage), 2) AS avg_year_increasing
 	FROM 
 		(SELECT 
