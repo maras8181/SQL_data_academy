@@ -360,17 +360,10 @@ FROM
 				rt1.category_code,
 				rt1.cpc_name AS name,
 				avg(rt1.cprice_value) AS avg_value_in_year_period,
-				rt1.entry_year,
-				rt1.year_period
+				rt1.entry_year
 			FROM 
 				(SELECT 
-					vmmt4.*,
-					CASE
-						WHEN vmmt4.entry_month < 4 THEN 1
-						WHEN vmmt4.entry_month < 7 THEN 2
-						WHEN vmmt4.entry_month < 10 THEN 3
-						ELSE 4
-					END AS year_period
+					*
 				FROM v_martin_mrazek_task_4 vmmt4) AS rt1
 			GROUP BY rt1.category_code, rt1.entry_year
 			ORDER BY rt1.category_code, rt1.entry_year) AS rt2
