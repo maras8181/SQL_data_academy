@@ -27,17 +27,18 @@
            Za poslední srovnatelné období je možné si koupit 1315 kg chleba a 1664 litrů mléka.
     
 ### 3. Která kategorie potravin zdražuje nejpomaleji (je u ní nejnižší percentuální meziroční nárůst)?
-- Odpověď: Nejméně zdražuje kategorie potravin '117101' (Rajská jablka červená kulatá). Tahle kategorie nemá v průběhu let nárust ceny, nýbrž pokles o 26,6 %.
+
+- Odpověď: Nejméně zdražuje kategorie potravin '117101' (Rajská jablka červená kulatá). Z výsledného dotazu je zřejmé že tahle kategorie nemá v průběhu let nárust ceny, nýbrž pokles o 26,6 %.
 
 ### 4. Existuje rok, ve kterém byl meziroční nárůst cen potravin výrazně vyšší než růst mezd (větší než 10 %)? ##
 
-- Odpověď: Tento rok neexistuje. Nejvyšší nárůst potravin byl v roce 2017, kdy cena potravin vzrostla o 8,78 %.
+- Odpověď: Tento rok neexistuje. Z výsledného dotazu je zřejmé, že nejvyšší procentní nárůst potravin byl v roce 2017, kdy cena potravin vzrostla o 8,78 %.
 
 ### 5. Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách ve stejném nebo násdujícím roce výraznějším růstem?
 
   <sup>Nejprve je zjištěn nárust % HDP, cen potravin a mezd v každém roce.</sup>
   <sup>Ve výsledném dotazu pak můžeme vidět nárust HDP, cen potravin a mezd ve stejném a následujícím roce (o kolik % se zvýšila/snížila jejich hodnota).</sup>
-  <sup>Z výsledků je patrné, že růst nebo pokles míry HDP nemá nijak razatní vliv na růst cen potravin a mezd.</sup>
+  <sup>Z výsledného dotazu je zřejmé, že růst nebo pokles míry HDP nemá nijak razatní vliv na růst cen potravin a mezd.</sup>
 
 - Odpověď: Výška HDP vliv na změny ve mzdách a cenách potravin nemá. Jakmile vzroste výrazněji výška HDP (nejvíce o 8 %), pak ve stejném, nebo následujícím roce
             se vzrůst mezd a cen potravin výraznějším růstem neprojeví.
