@@ -10,6 +10,7 @@
 - Odpověď: Mzdy rostou v průběhu let ve všech odvětvích.
 
 ### 2. Kolik je možné si koupit litrů mléka a kilogramů chleba za první a poslední srovnatelné období v dostupných datech cen a mezd?
+  
   *  #### První srovnatelné období (02-01-2006 - 08-01-2006):
       
       <sup>V tomto období byla průměrná mzda (vypočítána ze všech dostupných odvětví) 20.753,78 Kč.</sup>
