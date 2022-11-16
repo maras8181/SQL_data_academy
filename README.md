@@ -30,6 +30,7 @@
 - Odpověď: Nejméně zdražuje kategorie potravin '117101' (Rajská jablka červená kulatá). Tahle kategorie nemá v průběhu let nárust ceny, nýbrž pokles o 26,6 %.
 
 ### 4. Existuje rok, ve kterém byl meziroční nárůst cen potravin výrazně vyšší než růst mezd (větší než 10 %)? ##
+
 - Odpověď: Tento rok neexistuje. Nejvyšší nárůst potravin byl v roce 2017, kdy cena potravin vzrostla o 8,78 %.
 
 ### 5. Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách ve stejném nebo násdujícím roce výraznějším růstem?
