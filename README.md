@@ -2,10 +2,10 @@
 
 ### 1. Rostou v průběhu let mzdy ve všech odvětvích, nebo v některých klesají?
 
-  <sup>Hodnoty mezd jsou nejprve seskupeny podle odvětví, let a jednotlivých čtvrtletích v každém roce pomocí agregační funkce avg().</sup>
+  <sup>Hodnoty mezd jsou nejprve seskupeny podle odvětví, let a jednotlivých čtvrtletích v každém roce pomocí agregační funkce ```avg()```.</sup>
   <sup>Následně je celé období rozděleno na 2 poloviny (2006 - 2012 a 2012 - 2018, kde první polovina roku 2012 patří prvnímu období, a ta druhá druhému období).</sup>
-  <sup>Poté jsou data znovu seskupeny podle jednotlivých odvětví a podle obou období, kde hodnoty mezd v každém odvětví a období jsou zprůměrovány.</sup>
-  <sup>Z finálního dotazu pk můžeme vidět průměr mezd v každém odvětví za obě období. V případě, že průměrná mzda v jednotlivém období je vetší, než mzda v tom prvním období, pak je zřejmé, že mzdy v průběhu let rostou.</sup>
+  <sup>Poté jsou data znovu seskupeny podle jednotlivých odvětví a obou období, kde hodnoty mezd v každém odvětví a období jsou zprůměrovány opět pomocí agregační funkce ```avg()```.</sup>
+  <sup>Z finálního dotazu pak můžeme vidět průměr mezd v každém odvětví za obě období. V případě, že průměrná mzda v jednotlivém období je vetší, než mzda v tom prvním období, pak je zřejmé, že mzdy v průběhu let rostou.</sup>
   
 - Odpověď: Mzdy rostou v průběhu let ve všech odvětvích.
 
