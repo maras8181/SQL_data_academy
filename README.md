@@ -38,7 +38,7 @@
 
    <sup>Nejprve jsou zprůměrovány ceny všech kategorií potravin za jednotlivé roky.</sup>
    <sup>Následně jsou tyhle hodnoty seskupeny podle stejných let, kde je vypočítán jejich průměr pomocí agregační funkce ```avg()```.</sup>
-   <sup>Nakonec je vypočítán metiroční percentuální nárust cen potravin pro všechny roky. Z výsledného dotazu pak můžeme vidět, že nejvyšší procentní nárůst potravin byl v roce 2017, kdy ceny vzzrostly o 8,78 %.</sup>
+   <sup>Nakonec je vypočítán meziroční percentuální nárust cen potravin pro všechny roky. Z výsledného dotazu pak můžeme vidět, že nejvyšší procentní nárůst potravin byl v roce 2017, kdy ceny vzrostly o 8,78 %.</sup>
 
 - Odpověď: Tento rok neexistuje. Z výsledného dotazu je zřejmé, že nejvyšší procentní nárůst potravin byl v roce 2017, kdy cena potravin vzrostla o 8,78 %.
 
