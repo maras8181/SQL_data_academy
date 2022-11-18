@@ -11,17 +11,17 @@
 
 ### 2. Kolik je možné si koupit litrů mléka a kilogramů chleba za první a poslední srovnatelné období v dostupných datech cen a mezd?
   
-  * #### První srovnatelné období (02-01-2006 - 08-01-2006):
+  * První srovnatelné období (02-01-2006 - 08-01-2006):
       
-      <sup>V tomto období byla průměrná mzda (vypočítána ze všech dostupných odvětví) 20.753,78 Kč.</sup>
-      <sup>Průměrná cena za 1 kg chleba v tomhle období byla 14,9 Kč a za 1 litr mléka 14,27 Kč.</sup>
-      <sup>V případě, že by člověk pobírající tuhle průměrnou mzdu nakoupil pouze chleba a mléko, mohl by si koupit 1393 kg chleba a 1454 litrů mléka.</sup>
+    <sup>V tomto období byla průměrná mzda (vypočítána ze všech dostupných odvětví) 20.753,78 Kč.</sup>
+    <sup>Průměrná cena za 1 kg chleba v tomhle období byla 14,9 Kč a za 1 litr mléka 14,27 Kč.</sup>
+    <sup>V případě, že by člověk pobírající tuhle průměrnou mzdu nakoupil pouze chleba a mléko, mohl by si koupit 1393 kg chleba a 1454 litrů mléka.</sup>
    
-  * #### Poslední srovnatelné období (10-12-2018 - 16-12-2018):
+  * Poslední srovnatelné období (10-12-2018 - 16-12-2018):
       
-      <sup>V tomto období byla průměrná mzda (vypočítána ze všech dostupných odvětví) 32.535,86 Kč.</sup>
-      <sup>Průměrná cena za 1 kg chleba v tomhle období byla 24,74 Kč a za 1 litr mléka 19,55 Kč.</sup>
-      <sup>V případě, že by člověk pobírající tuhle průměrnou mzdu nakoupil pouze chleba a mléko, mohl by si koupit 1315 kg chleba a 1664 litrů mléka.</sub>
+   <sup>V tomto období byla průměrná mzda (vypočítána ze všech dostupných odvětví) 32.535,86 Kč.</sup>
+   <sup>Průměrná cena za 1 kg chleba v tomhle období byla 24,74 Kč a za 1 litr mléka 19,55 Kč.</sup>
+   <sup>V případě, že by člověk pobírající tuhle průměrnou mzdu nakoupil pouze chleba a mléko, mohl by si koupit 1315 kg chleba a 1664 litrů mléka.</sub>
    
 - Odpověď: Za první srovnatelné období je možné si koupit 1393 kg chleba a 1454 litrů mléka. 
            Za poslední srovnatelné období je možné si koupit 1315 kg chleba a 1664 litrů mléka.
@@ -34,7 +34,11 @@
 
 - Odpověď: Nejméně zdražuje kategorie potravin '117101' (Rajská jablka červená kulatá). Z výsledného dotazu je zřejmé že tahle kategorie nemá v průběhu let nárust ceny, nýbrž pokles o 26,6 %.
 
-### 4. Existuje rok, ve kterém byl meziroční nárůst cen potravin výrazně vyšší než růst mezd (větší než 10 %)? ##
+### 4. Existuje rok, ve kterém byl meziroční nárůst cen potravin výrazně vyšší než růst mezd (větší než 10 %)?
+
+   <sup>Nejprve jsou zprůměrovány ceny všech kategorií potravin za jednotlivé roky.</sup>
+   <sup>Následně jsou tyhle hodnoty seskupeny podle stejných let, kde je vypočítán jejich průměr pomocí agregační funkce ```avg()```.</sup>
+   <sup>Nakonec je vypočítán metiroční percentuální nárust cen potravin pro všechny roky. Z výsledného dotazu pak můžeme vidět, že nejvyšší procentní nárůst potravin byl v roce 2017, kdy jejich ceny vzrostly o 8,78 %.</sup>
 
 - Odpověď: Tento rok neexistuje. Z výsledného dotazu je zřejmé, že nejvyšší procentní nárůst potravin byl v roce 2017, kdy cena potravin vzrostla o 8,78 %.
 
