@@ -44,9 +44,5 @@
 
 ### 5. Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách ve stejném nebo násdujícím roce výraznějším růstem?
 
-  <sup>Nejprve je zjištěn nárust % HDP, cen potravin a mezd v každém roce.</sup>
-  <sup>Ve výsledném dotazu pak můžeme vidět nárust HDP, cen potravin a mezd ve stejném a následujícím roce (o kolik % se zvýšila/snížila jejich hodnota).</sup>
-  <sup>Z výsledného dotazu je zřejmé, že růst nebo pokles míry HDP nemá nijak razatní vliv na růst cen potravin a mezd.</sup>
-
 - Odpověď: Výška HDP vliv na změny ve mzdách a cenách potravin nemá. Jakmile vzroste výrazněji výška HDP (nejvíce o 8 %), pak ve stejném, nebo následujícím roce
             se vzrůst mezd a cen potravin výraznějším růstem neprojeví.
