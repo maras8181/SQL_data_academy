@@ -8,8 +8,8 @@
 ### LINE 165 - 174 -> VIEWS for the result query (LINE 341 - 370)
 ### LINE 180 - 210 -> VIEWS for the result query (LINE 376 - 442)
 
-### LINE 219 - 265 -> RESULT QUERY
-### LINE 271 - 302 -> RESULT QUERY
-### LINE 308 - 335 -> RESULT QUERY
-### LINE 341 - 370 -> RESULT QUERY
-### LINE 376 - 442 -> RESULT QUERY
+### LINE 219 - 265 -> RESULT QUERY (Question 1)
+### LINE 271 - 302 -> RESULT QUERY (Question 2)
+### LINE 308 - 335 -> RESULT QUERY (Question 3)
+### LINE 341 - 370 -> RESULT QUERY (Question 4)
+### LINE 376 - 442 -> RESULT QUERY (Question 5)
