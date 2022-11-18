@@ -2,9 +2,9 @@
 
 ### 1. Rostou v průběhu let mzdy ve všech odvětvích, nebo v některých klesají?
 
-  <sup>Hodnoty mezd jsou nejprve seskupeny podle odvětví, let a jednotlivých čtvrtletích v každém roce pomocí agregační funkce ```avg()```.</sup>
+  <sup>Hodnoty mezd jsou nejprve seskupeny podle odvětví, let a jednotlivých čtvrtletích, kde pro každou uvedenou skupinu jsou hodnoty zprůměrovány pomocí agregační funkce ```avg()```.</sup>
   <sup>Následně je celé období rozděleno na 2 poloviny (2006 - 2012 a 2012 - 2018, kde první polovina roku 2012 patří prvnímu období, a ta druhá druhému období).</sup>
-  <sup>Poté jsou data znovu seskupeny podle jednotlivých odvětví a obou období, kde hodnoty mezd v každém odvětví a období jsou zprůměrovány opět pomocí agregační funkce ```avg()```.</sup>
+  <sup>Poté jsou data znovu seskupena podle jednotlivých odvětví a obou období, kde hodnoty mezd v každém odvětví a období jsou zprůměrovány opět pomocí agregační funkce ```avg()```.</sup>
   <sup>Z finálního dotazu pak můžeme vidět průměr mezd v každém odvětví za obě období. V případě, že průměrná mzda v jednotlivém období je vetší, než mzda v tom prvním období, pak je zřejmé, že mzdy v průběhu let rostou.</sup>
   
 - Odpověď: Mzdy rostou v průběhu let ve všech odvětvích.
@@ -27,6 +27,10 @@
            Za poslední srovnatelné období je možné si koupit 1315 kg chleba a 1664 litrů mléka.
     
 ### 3. Která kategorie potravin zdražuje nejpomaleji (je u ní nejnižší percentuální meziroční nárůst)?
+
+   <sup>Nejprve je vypočítán percentuální nárust cen potravin pro každý rok (jednotlivé měsíce a dny).</sup>
+   <sup>Následně jsou tyto hodnoty sečteny v každém roce pro jednotlivé kategorie.</sup>
+   <sup>Jako poslední krok jsou hodnoty zprůměrovány pro všechny kategorie potravin pomocí agregační funkce ```avg()```, kde vybereme pouze první hodnotu ze vzestupně seřazených dat. Z výsledku vidímě kategorii '117101' (Rajská jablka červená kulatá), která nemá meziroční nárust, nýbrž pokles ceny v průběhu let.</sup>
 
 - Odpověď: Nejméně zdražuje kategorie potravin '117101' (Rajská jablka červená kulatá). Z výsledného dotazu je zřejmé že tahle kategorie nemá v průběhu let nárust ceny, nýbrž pokles o 26,6 %.
 
