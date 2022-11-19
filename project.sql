@@ -132,8 +132,7 @@ FROM
 		GROUP BY rt2.industry_branch_code, rt2.time_range) AS rt3
 	WHERE rt3.industry_branch_code = rt3.industry_branch_code_prev_row;
 	
-/* 2. Kolik je možné si koupit litrů mléka a kilogramů chleba za první a 
-poslední srovnatelné období v dostupných datech cen a mezd? */
+/* 2. Kolik je možné si koupit litrů mléka a kilogramů chleba za první a poslední srovnatelné období v dostupných datech cen a mezd? */
 
 /* Question 2 (VIEW 1) */
 
@@ -253,8 +252,7 @@ FROM
 	JOIN v_martin_mrazek_task_2_avg_wages vmmt2aw 
 		ON vmmt2ap.date_from = vmmt2aw.first_last_period) AS rt1;
 		
-/* 3. Která kategorie potravin zdražuje nejpomaleji (je u ní nejnižší percentuální 
- * meziroční nárůst)? */
+/* 3. Která kategorie potravin zdražuje nejpomaleji (je u ní nejnižší percentuální meziroční nárůst)? */
 	
 /* Question 3 (VIEW 1) */
 	
@@ -352,9 +350,8 @@ FROM
 			ORDER BY rt1.category_code, rt1.entry_year) AS rt2
 		GROUP BY rt2.entry_year) AS rt3) AS rt4;
 		
-/* 5. Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, 
-  pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách 
-  ve stejném nebo násdujícím roce výraznějším růstem?*/
+/* 5. Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách 
+  ve stejném nebo násdujícím roce výraznějším růstem? */
 	
 /* Question 5 (VIEW 1) */
 	
