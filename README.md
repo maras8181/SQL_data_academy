@@ -31,6 +31,7 @@
    <sup>Nejprve je vypočítán percentuální nárust cen potravin pro každý rok (jednotlivé měsíce a dny).</sup>
    <sup>Následně jsou tyto hodnoty sečteny v každém roce pro jednotlivé kategorie.</sup>
    <sup>Jako poslední krok jsou hodnoty zprůměrovány pro všechny kategorie potravin pomocí agregační funkce ```avg()```, kde vybereme pouze první hodnotu ze vzestupně seřazených dat. Z výsledku vidímě kategorii '117101' (Rajská jablka červená kulatá), která nemá meziroční nárust, nýbrž pokles ceny v průběhu let.</sup>
+   <sup>Od roku 2006 do roku 2018 z původních 57,97 Kč/1Kg postupně klesala cena na konečných 44,5 Kč/1Kg.</sup>
 
 - Odpověď: Nejméně zdražuje kategorie potravin '117101' (Rajská jablka červená kulatá). Z výsledného dotazu je zřejmé že tahle kategorie nemá v průběhu let nárust ceny, nýbrž pokles o 26,6 %.
 
