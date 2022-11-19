@@ -3,58 +3,57 @@
 /* PRIMARY TABLE */
 
 CREATE OR REPLACE TABLE t_martin_mrazek_project_SQL_primary_final AS 
-	(SELECT 
-		cpri.id AS cprice_id,
-		cpri.value AS cprice_value,
-		cpri.category_code,
-		cpri.date_from,
-		cpri.date_to,
-		MONTH(cpri.date_from) AS entry_month,
-		YEAR(cpri.date_from) AS entry_year,
-		cpri.region_code,
-		cpc.code AS cpc_code, 
-		cpc.name AS cpc_name,
-		cpc.price_value,
-		cpc.price_unit,
-		cpay.id AS cpayroll_id,
-		cpay.value AS cpayroll_value,
-		cpay.value_type_code,
-		cpay.unit_code,
-		cpay.calculation_code,
-		cpay.industry_branch_code,
-		cpay.payroll_year,
-		cpay.payroll_quarter,
-		cpib.code AS cpib_code,
-		cpib.name AS cpib_name
-	FROM czechia_price cpri
-	JOIN czechia_price_category cpc
-		ON cpri.category_code = cpc.code 
-	JOIN czechia_payroll cpay 
-		ON YEAR(cpri.date_from) = cpay.payroll_year
-	JOIN czechia_payroll_industry_branch cpib 
-		ON cpay.industry_branch_code = cpib.code
-	WHERE cpay.value_type_code = 5958);
+(SELECT 
+	cpri.id AS cprice_id,
+	cpri.value AS cprice_value,
+	cpri.category_code,
+	cpri.date_from,
+	cpri.date_to,
+	MONTH(cpri.date_from) AS entry_month,
+	YEAR(cpri.date_from) AS entry_year,
+	cpri.region_code,
+	cpc.code AS cpc_code, 
+	cpc.name AS cpc_name,
+	cpc.price_value,
+	cpc.price_unit,
+	cpay.id AS cpayroll_id,
+	cpay.value AS cpayroll_value,
+	cpay.value_type_code,
+	cpay.unit_code,
+	cpay.calculation_code,
+	cpay.industry_branch_code,
+	cpay.payroll_year,
+	cpay.payroll_quarter,
+	cpib.code AS cpib_code,
+	cpib.name AS cpib_name
+FROM czechia_price cpri
+JOIN czechia_price_category cpc
+	ON cpri.category_code = cpc.code 
+JOIN czechia_payroll cpay 
+	ON YEAR(cpri.date_from) = cpay.payroll_year
+JOIN czechia_payroll_industry_branch cpib 
+	ON cpay.industry_branch_code = cpib.code
+WHERE cpay.value_type_code = 5958);
 
 /* SECONDARY TABLE */ 
 
 CREATE OR REPLACE TABLE t_martin_mrazek_project_SQL_secondary_final AS 
+(SELECT 
+	c.country,
+	c.continent,
+	e.YEAR,
+	e.population,
+	e.GDP,
+	e.gini
+FROM countries c 
+JOIN economies e 
+	ON c.country = e.country
+WHERE c.continent = 'Europe'
+AND e.YEAR IN
 	(SELECT 
-		c.country,
-		c.continent,
-		e.YEAR,
-		e.population,
-		e.GDP,
-		e.gini
-	FROM countries c 
-	JOIN economies e 
-		ON c.country = e.country
-	WHERE c.continent = 'Europe'
-	AND e.YEAR IN (
-		SELECT 
-			DISTINCT tmm.entry_year
-		FROM t_martin_mrazek_project_sql_primary_final tmm
-		ORDER BY tmm.entry_year)
-	);
+		DISTINCT tmm.entry_year
+	FROM t_martin_mrazek_project_sql_primary_final tmm
+	ORDER BY tmm.entry_year));
 
 /* INDEXES */
 
@@ -320,35 +319,47 @@ ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month);
 /* Question 4 (FINAL QUERY) */
 
 SELECT 
-	round(rt4.avg_value_in_year, 2) AS avg_value_in_year,
-	rt4.entry_year,
-	round(rt4.year_percentage, 2) AS year_percentage
+	rt5.entry_year AS year,
+	round((rt5.avg_value_in_year), 2) AS avg_value_in_year,
+	rt5.price_year_percentage,
+	CASE 
+		WHEN rt5.price_year_percentage_prev_row IS NULL 
+			THEN concat(0, ' %')
+		ELSE concat(rt5.price_year_percentage - rt5.price_year_percentage_prev_row, ' %')
+	END AS price_year_percentage_difference
 FROM 
 	(SELECT 
-		*,
-		CASE 
-			WHEN rt3.avg_value_in_year_prev_row IS NULL THEN 0
-			ELSE (100 - (rt3.avg_value_in_year_prev_row / rt3.avg_value_in_year * 100))
-		END AS year_percentage	
+		rt4.entry_year,
+		rt4.avg_value_in_year,
+		round(rt4.year_percentage, 2) AS price_year_percentage,
+		lag(round(rt4.year_percentage, 2))
+			OVER (ORDER BY rt4.entry_year) AS price_year_percentage_prev_row
 	FROM 
 		(SELECT 
-			avg(rt2.avg_value_in_year_period) AS avg_value_in_year,
-			lag(avg(rt2.avg_value_in_year_period))
-				OVER (ORDER BY rt2.entry_year) AS avg_value_in_year_prev_row,
-			rt2.entry_year
+			*,
+			CASE 
+				WHEN rt3.avg_value_in_year_prev_row IS NULL THEN 0
+				ELSE (100 - (rt3.avg_value_in_year_prev_row / rt3.avg_value_in_year * 100))
+			END AS year_percentage	
 		FROM 
 			(SELECT 
-				rt1.category_code,
-				rt1.cpc_name AS name,
-				avg(rt1.cprice_value) AS avg_value_in_year_period,
-				rt1.entry_year
+				avg(rt2.avg_value_in_year_period) AS avg_value_in_year,
+				lag(avg(rt2.avg_value_in_year_period))
+					OVER (ORDER BY rt2.entry_year) AS avg_value_in_year_prev_row,
+				rt2.entry_year
 			FROM 
 				(SELECT 
-					*
-				FROM v_martin_mrazek_task_4 vmmt4) AS rt1
-			GROUP BY rt1.category_code, rt1.entry_year
-			ORDER BY rt1.category_code, rt1.entry_year) AS rt2
-		GROUP BY rt2.entry_year) AS rt3) AS rt4;
+					rt1.category_code,
+					rt1.cpc_name AS name,
+					avg(rt1.cprice_value) AS avg_value_in_year_period,
+					rt1.entry_year
+				FROM 
+					(SELECT 
+						*
+					FROM v_martin_mrazek_task_4 vmmt4) AS rt1
+				GROUP BY rt1.category_code, rt1.entry_year
+				ORDER BY rt1.category_code, rt1.entry_year) AS rt2
+			GROUP BY rt2.entry_year) AS rt3) AS rt4) AS rt5
 		
 /* 5. Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách 
   ve stejném nebo násdujícím roce výraznějším růstem? */
