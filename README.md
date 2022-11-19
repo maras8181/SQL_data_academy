@@ -28,7 +28,7 @@
     
 ### 3. Která kategorie potravin zdražuje nejpomaleji (je u ní nejnižší percentuální meziroční nárůst)?
 
-   <sup>Nejprve je vypočítán percentuální nárust cen potravin pro každý rok (jednotlivé měsíce a dny).</sup>
+   <sup>Nejprve je vypočítán percentuální nárust cen všech kategoríí potravin pro každý rok (jednotlivé měsíce a dny).</sup>
    <sup>Následně jsou tyto hodnoty sečteny v každém roce pro jednotlivé kategorie.</sup>
    <sup>Jako poslední krok jsou sečtené hodnoty zprůměrovány v každém roce pro všechny kategorie potravin pomocí agregační funkce ```avg()```, kde vybereme pouze první hodnotu ze vzestupně seřazených dat podle sloupce z výslednými hodnotami. Z výsledku vidíme kategorii '117101' (Rajská jablka červená kulatá), která nemá meziroční nárust, nýbrž pokles ceny v průběhu let.</sup>
 
