@@ -258,47 +258,64 @@ FROM
 CREATE OR REPLACE VIEW v_martin_mrazek_task_3 AS 
 (SELECT 
 	DISTINCT tmm.category_code,
-	lag(tmm.category_code) 
-		OVER (ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month) AS category_code_prev_row,
 	tmm.cpc_name,
-	avg(tmm.cprice_value) AS avg_value_in_month,
-	lag(avg(tmm.cprice_value)) 
-		OVER (ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month) AS avg_value_in_month_prev_row,
+	tmm.cprice_value,
 	tmm.entry_month,
 	tmm.entry_year
 FROM t_martin_mrazek_project_SQL_primary_final tmm
-GROUP BY tmm.category_code, tmm.entry_year, tmm.entry_month
 ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month);
 
 /* Question 3 (FINAL QUERY) */
 
 SELECT 
-	rt3.category_code,
-	rt3.cpc_name,
-	rt3.avg_year_increasing
+	rt6.category_code,
+	rt6.name,
+	concat(rt6.year_on_year_increase, ' %') AS year_on_year_increase
 FROM 
 	(SELECT 
-		rt2.category_code,
-		rt2.cpc_name,
-		round(avg(rt2.sum_of_year_percentage), 2) AS avg_year_increasing
+		rt5.category_code,
+		rt5.name,
+		round(avg(rt5.year_on_year_increase), 2) AS year_on_year_increase
+	FROM 
+	(SELECT 
+		*,
+		CASE 
+			WHEN rt4.category_code = rt4.category_code_prev_row
+				THEN ((rt4.avg_value_in_year - rt4.avg_value_in_year_prev_row) / rt4.avg_value_in_year_prev_row) * 100
+			ELSE 0
+		END year_on_year_increase
 	FROM 
 		(SELECT 
-			rt1.category_code,
-			rt1.cpc_name,
-			sum(rt1.percentage) AS sum_of_year_percentage,
-			rt1.entry_year
+			rt3.category_code,
+			lag(rt3.category_code) OVER
+				(ORDER BY rt3.category_code, rt3.entry_year) AS category_code_prev_row,
+			rt3.name,
+			rt3.avg_value_in_year,
+			lag(rt3.avg_value_in_year) OVER
+				(ORDER BY rt3.category_code, rt3.entry_year) AS avg_value_in_year_prev_row,
+			rt3.entry_year
 		FROM 
-		(SELECT 
-			*,
-			CASE 
-				WHEN vmmt3.category_code = vmmt3.category_code_prev_row THEN
-					(100 - (vmmt3.avg_value_in_month_prev_row / vmmt3.avg_value_in_month * 100))
-				ELSE 0
-			END AS percentage
-		FROM v_martin_mrazek_task_3 vmmt3) AS rt1
-	GROUP BY rt1.category_code, rt1.entry_year) AS rt2
-GROUP BY rt2.category_code) AS rt3
-ORDER BY rt3.avg_year_increasing
+			(SELECT 
+				rt2.category_code,
+				rt2.name,
+				round(avg(rt2.avg_value_in_month), 2) AS avg_value_in_year,
+				rt2.entry_year
+			FROM 
+				(SELECT 
+					rt1.category_code,
+					rt1.cpc_name AS name,
+					round(avg(rt1.cprice_value), 2) AS avg_value_in_month,
+					rt1.entry_month,
+					rt1.entry_year
+				FROM 
+					(SELECT 
+						*
+					FROM v_martin_mrazek_task_3 vmmt3) AS rt1
+				GROUP BY rt1.category_code, rt1.entry_year, rt1.entry_month
+				ORDER BY rt1.category_code, rt1.entry_year, rt1.entry_month) AS rt2
+		GROUP BY rt2.category_code, rt2.entry_year) AS rt3) AS rt4) AS rt5
+	GROUP BY rt5.category_code) AS rt6
+ORDER BY rt6.year_on_year_increase
 LIMIT 1;
 
 /* 4. Existuje rok, ve kterém byl meziroční nárůst cen potravin výrazně vyšší než růst mezd (větší než 10 %)? */
@@ -319,28 +336,27 @@ ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month);
 /* Question 4 (FINAL QUERY) */
 
 SELECT 
-	rt5.entry_year AS year,
-	round((rt5.avg_value_in_year), 2) AS avg_value_in_year,
+	rt5.avg_value_in_year,
+	rt5.entry_year,
 	rt5.price_year_percentage,
 	CASE 
-		WHEN rt5.price_year_percentage_prev_row IS NULL 
-			THEN concat(0, ' %')
+		WHEN rt5.price_year_percentage_prev_row IS NULL THEN '0 %'
 		ELSE concat(rt5.price_year_percentage - rt5.price_year_percentage_prev_row, ' %')
-	END AS price_year_percentage_difference
+	END AS price_year_percentage_difference	
 FROM 
 	(SELECT 
+		round((rt4.avg_value_in_year), 2) AS avg_value_in_year,
 		rt4.entry_year,
-		rt4.avg_value_in_year,
-		round(rt4.year_percentage, 2) AS price_year_percentage,
-		lag(round(rt4.year_percentage, 2))
+		round((rt4.year_on_year_percentage), 2) AS price_year_percentage,
+		lag(round((rt4.year_on_year_percentage), 2))
 			OVER (ORDER BY rt4.entry_year) AS price_year_percentage_prev_row
 	FROM 
 		(SELECT 
 			*,
 			CASE 
 				WHEN rt3.avg_value_in_year_prev_row IS NULL THEN 0
-				ELSE (100 - (rt3.avg_value_in_year_prev_row / rt3.avg_value_in_year * 100))
-			END AS year_percentage	
+				ELSE ((rt3.avg_value_in_year - rt3.avg_value_in_year_prev_row) / rt3.avg_value_in_year_prev_row) * 100
+			END AS year_on_year_percentage	
 		FROM 
 			(SELECT 
 				avg(rt2.avg_value_in_year_period) AS avg_value_in_year,
@@ -359,7 +375,7 @@ FROM
 					FROM v_martin_mrazek_task_4 vmmt4) AS rt1
 				GROUP BY rt1.category_code, rt1.entry_year
 				ORDER BY rt1.category_code, rt1.entry_year) AS rt2
-			GROUP BY rt2.entry_year) AS rt3) AS rt4) AS rt5
+			GROUP BY rt2.entry_year) AS rt3) AS rt4) AS rt5;
 		
 /* 5. Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách 
   ve stejném nebo násdujícím roce výraznějším růstem? */
@@ -386,7 +402,7 @@ FROM
 			*,
 			CASE 
 				WHEN rt2.country = rt2.country_prev_row
-					THEN (100 - (rt2.gdp_prev_row / rt2.gdp * 100))
+					THEN ((rt2.gdp - rt2.gdp_prev_row) / rt2.gdp_prev_row) * 100
 				ELSE 0
 			END AS year_percentage	
 		FROM 
@@ -427,7 +443,7 @@ FROM
 			*,
 			CASE 
 				WHEN rt3.avg_value_in_year_prev_row IS NULL THEN 0
-				ELSE (100 - (rt3.avg_value_in_year_prev_row / rt3.avg_value_in_year * 100))
+				ELSE ((rt3.avg_value_in_year - rt3.avg_value_in_year_prev_row) / rt3.avg_value_in_year_prev_row) * 100
 			END AS year_percentage	
 		FROM 
 			(SELECT 
@@ -472,7 +488,7 @@ FROM
 			CASE 
 				WHEN rt2.avg_wage_in_year_prev_row IS NULL
 					THEN 0
-				ELSE (100 - (rt2.avg_wage_in_year_prev_row / rt2.avg_wage_in_year * 100))
+				ELSE ((rt2.avg_wage_in_year - rt2.avg_wage_in_year_prev_row) / rt2.avg_wage_in_year_prev_row) * 100
 			END AS payroll_perc_difference
 		FROM 
 			(SELECT 
