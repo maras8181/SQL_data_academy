@@ -30,17 +30,17 @@
 
    <sup>Nejprve je vypočítán percentuální nárust cen všech kategoríí potravin pro každý rok (jednotlivé měsíce a dny).</sup>
    <sup>Následně jsou tyto hodnoty sečteny v každém roce pro jednotlivé kategorie.</sup>
-   <sup>Jako poslední krok jsou sečtené hodnoty zprůměrovány v každém roce pro všechny kategorie potravin pomocí agregační funkce ```avg()```, kde vybereme pouze první hodnotu ze vzestupně seřazených dat podle sloupce z výslednými hodnotami. Z výsledku vidíme kategorii '117101' (Rajská jablka červená kulatá), která nemá meziroční nárust, nýbrž pokles ceny v průběhu let.</sup>
+   <sup>Jako poslední krok jsou sečtené hodnoty zprůměrovány v každém roce pro všechny kategorie potravin pomocí agregační funkce ```avg()```, kde vybereme pouze první hodnotu ze vzestupně seřazených dat podle sloupce z výslednými hodnotami. Z výsledku vidíme kategorii '118101' (Cukr krystalový), který nemá nárust ceny v průběhu let, nýbrž pokles průměrně o 1,75 % ročně.</sup>
 
-- Odpověď: Nejméně zdražuje kategorie potravin '117101' (Rajská jablka červená kulatá). Z výsledného dotazu je zřejmé, že tahle kategorie nemá v průběhu let nárust ceny, nýbrž pokles o 26,6 %. Od roku 2006 do roku 2018 z původních 57,97 Kč/1Kg postupně klesala cena na konečných 44,5 Kč/1Kg (57,97 Kč - průměrná cena za 1 kg v roce 2006, 44,5 Kč - průměrná cena za 1 kg v roce 2018).
+- Odpověď: Nejméně zdražuje kategorie potravin '118101' (Cukr krystalový). Z výsledného dotazu je zřejmé, že cena této kategorie průměrně za 1 rok klesne o 1,75 %. Od roku 2006 do roku 2018 z původních 21,68 Kč/1Kg postupně rostla/klesala cena na konečných 15,75 Kč/1Kg (21,68 Kč - průměrná cena za 1 kg v roce 2006, 15,75 Kč - průměrná cena za 1 kg v roce 2018).
 
 ### 4. Existuje rok, ve kterém byl meziroční nárůst cen potravin výrazně vyšší než růst mezd (větší než 10 %)?
 
    <sup>Nejprve jsou zprůměrovány ceny potravin podle jednotlivých kategorií a let.</sup>
    <sup>Následně jsou tyhle hodnoty seskupeny podle stejných let, kde je vypočítán jejich průměr pomocí agregační funkce ```avg()```.</sup>
-   <sup>Nakonec je vypočítán meziroční percentuální nárust cen potravin pro všechny roky. Z výsledného dotazu pak můžeme vidět, že nejvyšší procentní nárůst potravin byl v roce 2017, kdy ceny vzrostly o 8,78 %.</sup>
+   <sup>Nakonec je vypočítán meziroční percentuální nárust cen potravin pro všechny roky. Z výsledného dotazu pak můžeme vidět, že nejvyšší procentní nárůst potravin byl v roce 2017, kdy ceny vzrostly oproti minulému roku o 10,82 %.</sup>
 
-- Odpověď: Tento rok neexistuje. Z výsledného dotazu je zřejmé, že nejvyšší procentní nárůst potravin byl v roce 2017, kdy oproti předchozímu roku cena potravin vzrostla o 9,99 %.
+- Odpověď: Ano, tento rok existuje. Z výsledného dotazu je zřejmé, že nejvyšší procentní nárůst potravin byl v roce 2017, kdy oproti předchozímu roku ceny potravin vzrostly o 10,82 %.
 
 ### 5. Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách ve stejném nebo násdujícím roce výraznějším růstem?
 
@@ -49,4 +49,4 @@
    <sup>Z výsledného dotazu pak můžeme vidět, o kolik % se zvýšila (nebo snížila) míra HDP v každém roce.</sup>
    <sup>Stejným způsobem je vypočítán nárust cen potravin a mezd v každém roce, kde jejich procentní navýšení, nebo pokles můžeme vidět ve stejném výsledku (výsledném dotazu) jako míru HDP.</sup>
 
-- Odpověď: Ano, má. Konkrétně v roce 2010, kdy míra HDP oproti předchozímu roku vzrostla o 7,5 %. Ceny potravin ve stejném roce vzrostly o 8,76 %, což je druhý nejvyšší nárust v průběhu let. Nejvyšší nárust potravin oproti předchozímu roku byl v roce 2017, kdy ceny vzrostly o 9,99 %. Nejvyšší nárust mezd pak v roce 2014, kdy mzdy oproti předchozímu roku vzrostly o 4,07 %. V těchto letech míra HDP nevzrostla více než o 0,6 %.
+- Odpověď: Ano, má. Konkrétně v roce 2010, kdy míra HDP oproti předchozímu roku vzrostla o 7,11 %. Ceny potravin ve stejném roce vzrostly o 8,35 %, což je druhý nejvyšší nárust v průběhu let. Nejvyšší nárust potravin oproti předchozímu roku byl v roce 2017, kdy ceny vzrostly o 10.82 %. Nejvyšší nárust mezd pak v roce 2014, kdy mzdy oproti předchozímu roku vzrostly o 4,12 %. V těchto letech míra HDP nevzrostla více než o 0,7 %.
