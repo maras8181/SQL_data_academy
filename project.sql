@@ -336,46 +336,35 @@ ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month);
 /* Question 4 (FINAL QUERY) */
 
 SELECT 
-	rt5.avg_value_in_year,
-	rt5.entry_year,
-	rt5.price_year_percentage,
-	CASE 
-		WHEN rt5.price_year_percentage_prev_row IS NULL THEN '0 %'
-		ELSE concat(rt5.price_year_percentage - rt5.price_year_percentage_prev_row, ' %')
-	END AS price_year_percentage_difference	
+	rt4.entry_year AS year,
+	round((rt4.avg_value_in_year), 2) AS avg_price_value_in_year,	
+	concat(round((rt4.year_on_year_percentage), 2), ' %') AS price_year_percentage_increase
 FROM 
 	(SELECT 
-		round((rt4.avg_value_in_year), 2) AS avg_value_in_year,
-		rt4.entry_year,
-		round((rt4.year_on_year_percentage), 2) AS price_year_percentage,
-		lag(round((rt4.year_on_year_percentage), 2))
-			OVER (ORDER BY rt4.entry_year) AS price_year_percentage_prev_row
+		*,
+		CASE 
+			WHEN rt3.avg_value_in_year_prev_row IS NULL THEN 0
+			ELSE ((rt3.avg_value_in_year - rt3.avg_value_in_year_prev_row) / rt3.avg_value_in_year_prev_row) * 100
+		END AS year_on_year_percentage
 	FROM 
 		(SELECT 
-			*,
-			CASE 
-				WHEN rt3.avg_value_in_year_prev_row IS NULL THEN 0
-				ELSE ((rt3.avg_value_in_year - rt3.avg_value_in_year_prev_row) / rt3.avg_value_in_year_prev_row) * 100
-			END AS year_on_year_percentage	
+			avg(rt2.avg_value_in_year_period) AS avg_value_in_year,
+			lag(avg(rt2.avg_value_in_year_period))
+				OVER (ORDER BY rt2.entry_year) AS avg_value_in_year_prev_row,
+			rt2.entry_year			
 		FROM 
 			(SELECT 
-				avg(rt2.avg_value_in_year_period) AS avg_value_in_year,
-				lag(avg(rt2.avg_value_in_year_period))
-					OVER (ORDER BY rt2.entry_year) AS avg_value_in_year_prev_row,
-				rt2.entry_year
+				rt1.category_code,
+				rt1.cpc_name AS name,
+				avg(rt1.cprice_value) AS avg_value_in_year_period,
+				rt1.entry_year
 			FROM 
 				(SELECT 
-					rt1.category_code,
-					rt1.cpc_name AS name,
-					avg(rt1.cprice_value) AS avg_value_in_year_period,
-					rt1.entry_year
-				FROM 
-					(SELECT 
-						*
-					FROM v_martin_mrazek_task_4 vmmt4) AS rt1
-				GROUP BY rt1.category_code, rt1.entry_year
-				ORDER BY rt1.category_code, rt1.entry_year) AS rt2
-			GROUP BY rt2.entry_year) AS rt3) AS rt4) AS rt5;
+					*
+				FROM v_martin_mrazek_task_4 vmmt4) AS rt1
+			GROUP BY rt1.category_code, rt1.entry_year
+			ORDER BY rt1.category_code, rt1.entry_year) AS rt2
+		GROUP BY rt2.entry_year) AS rt3) AS rt4;
 		
 /* 5. Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách 
   ve stejném nebo násdujícím roce výraznějším růstem? */
@@ -384,134 +373,104 @@ FROM
 	
 CREATE OR REPLACE VIEW v_martin_mrazek_task_5_gdp AS 
 (SELECT 
-	rt4.YEAR,
-	rt4.gdp_year_percentage,
-	CASE 
-		WHEN rt4.gdp_year_percentage_prev_row IS NULL THEN
-			'0 %'
-		ELSE concat(rt4.gdp_year_percentage - rt4.gdp_year_percentage_prev_row, ' %')
-	END AS gdp_year_percentage_difference	
+	rt3.YEAR,
+	rt3.gdp,
+	concat(round((rt3.year_percentage), 2), ' %') AS gdp_year_percentage_increase
 FROM 
 	(SELECT 
-		rt3.YEAR,
-		round(avg(rt3.year_percentage), 2) AS gdp_year_percentage,
-		lag(round(avg(rt3.year_percentage), 2))
-			OVER (ORDER BY rt3.year) AS gdp_year_percentage_prev_row
+		*,
+		CASE 
+			WHEN rt2.country = rt2.country_prev_row
+				THEN ((rt2.gdp - rt2.gdp_prev_row) / rt2.gdp_prev_row) * 100
+			ELSE 0	
+		END AS year_percentage	
 	FROM 
 		(SELECT 
-			*,
-			CASE 
-				WHEN rt2.country = rt2.country_prev_row
-					THEN ((rt2.gdp - rt2.gdp_prev_row) / rt2.gdp_prev_row) * 100
-				ELSE 0
-			END AS year_percentage	
+			rt1.country,
+			lag(rt1.country)
+				OVER (ORDER BY rt1.country, rt1.year) AS country_prev_row,
+			rt1.YEAR,
+			rt1.gdp,
+			lag(rt1.gdp)
+				OVER (ORDER BY rt1.country, rt1.year) AS gdp_prev_row
 		FROM 
 			(SELECT 
-				rt1.country,
-				lag(rt1.country)
-					OVER (ORDER BY rt1.country, rt1.year) AS country_prev_row,
-				rt1.YEAR,
-				rt1.gdp,
-				lag(rt1.gdp)
-					OVER (ORDER BY rt1.country, rt1.year) AS gdp_prev_row
-			FROM 
-				(SELECT 
-					*
-				FROM t_martin_mrazek_project_sql_secondary_final tmmpssf) AS rt1
-			ORDER BY rt1.country, rt1.YEAR) AS rt2) AS rt3
-		GROUP BY rt3.YEAR) AS rt4);
+				*
+			FROM t_martin_mrazek_project_sql_secondary_final tmmpssf) AS rt1
+		ORDER BY rt1.country, rt1.YEAR) AS rt2) AS rt3
+	GROUP BY rt3.YEAR);
 	
 /* Question 5 (VIEW 2) */
 
 CREATE OR REPLACE VIEW v_martin_mrazek_task_5_prices AS 
 (SELECT 
-	rt5.entry_year,
-	rt5.price_year_percentage,
-	CASE 
-		WHEN rt5.price_year_percentage_prev_row IS NULL 
-			THEN concat(0, ' %')
-		ELSE concat(rt5.price_year_percentage - rt5.price_year_percentage_prev_row, ' %')
-	END AS price_year_percentage_difference
+	rt4.entry_year,
+	round((rt4.avg_price_value_in_year), 2) AS avg_price_value_in_year,
+	concat(round((rt4.year_percentage_increase), 2), ' %') AS price_year_percentage_increase
 FROM 
 	(SELECT 
-		rt4.entry_year,
-		round(rt4.year_percentage, 2) AS price_year_percentage,
-		lag(round(rt4.year_percentage, 2))
-			OVER (ORDER BY rt4.entry_year) AS price_year_percentage_prev_row
+		*,
+		CASE 
+			WHEN rt3.avg_value_in_year_prev_row IS NULL THEN 0
+			ELSE ((rt3.avg_price_value_in_year - rt3.avg_value_in_year_prev_row) / rt3.avg_value_in_year_prev_row) * 100
+		END AS year_percentage_increase		
 	FROM 
 		(SELECT 
-			*,
-			CASE 
-				WHEN rt3.avg_value_in_year_prev_row IS NULL THEN 0
-				ELSE ((rt3.avg_value_in_year - rt3.avg_value_in_year_prev_row) / rt3.avg_value_in_year_prev_row) * 100
-			END AS year_percentage	
+			avg(rt2.avg_value_in_year_period) AS avg_price_value_in_year,
+			lag(avg(rt2.avg_value_in_year_period))
+				OVER (ORDER BY rt2.entry_year) AS avg_value_in_year_prev_row,
+			rt2.entry_year
 		FROM 
 			(SELECT 
-				avg(rt2.avg_value_in_year_period) AS avg_value_in_year,
-				lag(avg(rt2.avg_value_in_year_period))
-					OVER (ORDER BY rt2.entry_year) AS avg_value_in_year_prev_row,
-				rt2.entry_year
+				rt1.category_code,
+				rt1.cpc_name AS name,
+				avg(rt1.cprice_value) AS avg_value_in_year_period,
+				rt1.entry_year
 			FROM 
 				(SELECT 
-					rt1.category_code,
-					rt1.cpc_name AS name,
-					avg(rt1.cprice_value) AS avg_value_in_year_period,
-					rt1.entry_year
-				FROM 
-					(SELECT 
-						*
-					FROM v_martin_mrazek_task_4 vmmt4) AS rt1
-				GROUP BY rt1.category_code, rt1.entry_year
-				ORDER BY rt1.category_code, rt1.entry_year) AS rt2
-			GROUP BY rt2.entry_year) AS rt3) AS rt4) AS rt5);
+					*
+				FROM v_martin_mrazek_task_4 vmmt4) AS rt1
+			GROUP BY rt1.category_code, rt1.entry_year
+			ORDER BY rt1.category_code, rt1.entry_year) AS rt2
+		GROUP BY rt2.entry_year) AS rt3) AS rt4);
 
 /* Question 5 (VIEW 3) */
 
 CREATE OR REPLACE VIEW v_martin_mrazek_task_5_wages AS 
 (SELECT 
-	rt4.payroll_year,
-	rt4.payroll_year_percentage,
-	CASE 
-		WHEN rt4.payroll_year_percentage_prev_row IS NULL 
-			THEN '0 %'
-		ELSE concat(rt4.payroll_year_percentage - rt4.payroll_year_percentage_prev_row, ' %')
-	END AS payroll_year_percentage_difference	
+	rt3.payroll_year,
+	round((rt3.avg_wage_in_year), 2) AS avg_wage_in_year,
+	concat(round((wage_percentage_increase), 2), ' %') AS wage_year_percentage_increase
 FROM 
 	(SELECT 
-		rt3.payroll_year,
-		round(rt3.payroll_perc_difference, 2) AS payroll_year_percentage,
-		lag(round(rt3.payroll_perc_difference, 2))
-			OVER (ORDER BY rt3.payroll_year) AS payroll_year_percentage_prev_row
+		*,
+		CASE 
+			WHEN rt2.avg_wage_in_year_prev_row IS NULL
+				THEN 0
+			ELSE ((rt2.avg_wage_in_year - rt2.avg_wage_in_year_prev_row) / rt2.avg_wage_in_year_prev_row) * 100
+		END AS wage_percentage_increase
 	FROM 
 		(SELECT 
-			*,
-			CASE 
-				WHEN rt2.avg_wage_in_year_prev_row IS NULL
-					THEN 0
-				ELSE ((rt2.avg_wage_in_year - rt2.avg_wage_in_year_prev_row) / rt2.avg_wage_in_year_prev_row) * 100
-			END AS payroll_perc_difference
+			rt1.payroll_year,
+			round(avg(rt1.cpayroll_value), 2) AS avg_wage_in_year,
+			lag(round(avg(rt1.cpayroll_value), 2))
+				OVER (ORDER BY rt1.payroll_year) AS avg_wage_in_year_prev_row
 		FROM 
 			(SELECT 
-				rt1.payroll_year,
-				round(avg(rt1.cpayroll_value), 2) AS avg_wage_in_year,
-				lag(round(avg(rt1.cpayroll_value), 2))
-					OVER (ORDER BY rt1.payroll_year) AS avg_wage_in_year_prev_row
-			FROM 
-				(SELECT 
-					*
-				FROM v_martin_mrazek_task_1 vmmt) AS rt1
-			GROUP BY rt1.payroll_year) AS rt2) AS rt3) AS rt4);
+				*
+			FROM v_martin_mrazek_task_1 vmmt) AS rt1
+		GROUP BY rt1.payroll_year) AS rt2) AS rt3);
 
 /* Question 5 (FINAL QUERY) */
 		
 SELECT 
 	rt1.YEAR,
-	rt1.gdp_year_percentage,
-	rt1.gdp_year_percentage_difference,
-	rt1.price_year_percentage,
-	rt1.price_year_percentage_difference,
-	rt1.payroll_year_percentage,
-	rt1.payroll_year_percentage_difference
+	rt1.gdp,
+	rt1.gdp_year_percentage_increase,
+	rt1.avg_price_value_in_year,
+	rt1.price_year_percentage_increase,
+	rt1.avg_wage_in_year,
+	rt1.wage_year_percentage_increase
 FROM
 	(SELECT 
 		*
