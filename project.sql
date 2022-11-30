@@ -162,47 +162,30 @@ ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month);
 /* Question 3 (FINAL QUERY) */
 
 SELECT 
-	rt4.category_code,
-	rt4.name,
-	concat(round(avg(rt4.year_on_year_increase), 2), ' %') AS year_on_year_increase
-FROM
-(SELECT 
-	*,
-	CASE 
-		WHEN rt3.category_code = rt3.category_code_prev_row
-			THEN ((rt3.avg_value_in_year - rt3.avg_value_in_year_prev_row) / rt3.avg_value_in_year_prev_row) * 100
-		ELSE 0
-	END year_on_year_increase
+	rt2.category_code,
+	rt2.name,
+	concat(round(avg(rt2.year_on_year_increase), 2), ' %') AS year_on_year_increase
 FROM
 	(SELECT 
-		rt2.category_code,
-		lag(rt2.category_code) OVER
-			(PARTITION BY rt2.name ORDER BY rt2.category_code, rt2.entry_year) AS category_code_prev_row,
-		rt2.name,
-		rt2.avg_value_in_year,
-		lag(rt2.avg_value_in_year) OVER
-			(PARTITION BY rt2.name ORDER BY rt2.category_code, rt2.entry_year) AS avg_value_in_year_prev_row,
-		rt2.entry_year
+		*,
+		CASE 
+			WHEN rt1.avg_value_in_year_prev_row IS NULL THEN 0
+			ELSE ((avg_value_in_year - rt1.avg_value_in_year_prev_row) / rt1.avg_value_in_year_prev_row) * 100
+		END AS year_on_year_increase	
 	FROM 
-		(SELECT
-			rt1.category_code,
-			rt1.name,
-			round(avg(rt1.avg_value_in_month), 2) AS avg_value_in_year,
-			rt1.entry_year
-		FROM 
-			(SELECT 
-				vmmt3.category_code,
-				vmmt3.cpc_name AS name,
-				round(avg(vmmt3.cprice_value), 2) AS avg_value_in_month,
-				vmmt3.entry_month,
-				vmmt3.entry_year
-			FROM v_martin_mrazek_task_3 vmmt3
-			GROUP BY vmmt3.category_code, vmmt3.entry_year, vmmt3.entry_month
-			ORDER BY vmmt3.category_code, vmmt3.entry_year, vmmt3.entry_month) AS rt1
-		GROUP BY rt1.category_code, rt1.entry_year) AS rt2) AS rt3) AS rt4
-	GROUP BY rt4.category_code
-	ORDER BY round(avg(rt4.year_on_year_increase), 2)
-LIMIT 1;
+		(SELECT 
+			vmmt3.category_code,
+			vmmt3.cpc_name AS name,
+			avg(vmmt3.cprice_value) AS avg_value_in_year,
+			lag(avg(vmmt3.cprice_value))
+				OVER (PARTITION BY vmmt3.category_code
+					ORDER BY vmmt3.category_code, vmmt3.entry_year) AS avg_value_in_year_prev_row,
+			vmmt3.entry_year
+		FROM v_martin_mrazek_task_3 vmmt3
+		GROUP BY vmmt3.category_code, vmmt3.entry_year) AS rt1) AS rt2
+	GROUP BY rt2.category_code
+	ORDER BY round(avg(rt2.year_on_year_increase), 2)
+	LIMIT 1;
 
 /* 4. Existuje rok, ve kterém byl meziroční nárůst cen potravin výrazně vyšší než růst mezd (větší než 10 %)? */
 
@@ -222,32 +205,33 @@ ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month);
 /* Question 4 (FINAL QUERY) */
 
 SELECT 
-	rt3.entry_year AS year,
-	round((rt3.avg_value_in_year), 2) AS avg_price_value_in_year,	
+	rt3.entry_year AS YEAR,
+	round((rt3.avg_value_in_year), 2) AS avg_price_value_in_year,
 	concat(round((rt3.year_on_year_percentage), 2), ' %') AS price_year_percentage_increase
-FROM
+FROM 
 	(SELECT 
 		*,
 		CASE 
 			WHEN rt2.avg_value_in_year_prev_row IS NULL THEN 0
 			ELSE ((rt2.avg_value_in_year - rt2.avg_value_in_year_prev_row) / rt2.avg_value_in_year_prev_row) * 100
 		END AS year_on_year_percentage
-	FROM
+	FROM 
 		(SELECT 
-			avg(rt1.avg_value_in_year_period) AS avg_value_in_year,
-			lag(avg(rt1.avg_value_in_year_period))
-				OVER (PARTITION BY rt1.name ORDER BY rt1.entry_year) AS avg_value_in_year_prev_row,
-			rt1.entry_year			
-		FROM
+			rt1.entry_year,
+			avg(rt1.avg_value_in_year) AS avg_value_in_year,
+			avg(rt1.avg_value_in_year_prev_row) AS avg_value_in_year_prev_row
+		FROM 
 			(SELECT 
 				vmmt4.category_code,
 				vmmt4.cpc_name AS name,
-				avg(vmmt4.cprice_value) AS avg_value_in_year_period,
+				avg(vmmt4.cprice_value) AS avg_value_in_year,
+				lag(avg(vmmt4.cprice_value))
+					OVER (PARTITION BY vmmt4.category_code 
+						ORDER BY vmmt4.entry_year) AS avg_value_in_year_prev_row,
 				vmmt4.entry_year
 			FROM v_martin_mrazek_task_4 vmmt4
-			GROUP BY vmmt4.category_code, vmmt4.entry_year
-			ORDER BY vmmt4.category_code, vmmt4.entry_year) AS rt1 
-		GROUP BY rt1.entry_year) AS rt2) AS rt3;
+			GROUP BY vmmt4.category_code, vmmt4.entry_year) AS rt1
+			GROUP BY rt1.entry_year) AS rt2) AS rt3;
 		
 /* 5. Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách 
   ve stejném nebo násdujícím roce výraznějším růstem? */
@@ -257,58 +241,55 @@ FROM
 CREATE OR REPLACE VIEW v_martin_mrazek_task_5_gdp AS 
 (SELECT 
 	rt2.YEAR,
-	rt2.gdp,
-	concat(round((rt2.year_percentage), 2), ' %') AS gdp_year_percentage_increase
+	rt2.avg_gdp,
+	concat(round((rt2.gdp_year_percentage), 2), ' %') AS gdp_year_percentage_increase
 FROM
 	(SELECT 
 		*,
 		CASE 
-			WHEN rt1.country = rt1.country_prev_row
-				THEN ((rt1.gdp - rt1.gdp_prev_row) / rt1.gdp_prev_row) * 100
-			ELSE 0	
-		END AS year_percentage	
+			WHEN rt1.avg_gdp_prev_row IS NULL THEN 0
+			ELSE ((rt1.avg_gdp - rt1.avg_gdp_prev_row) / rt1.avg_gdp_prev_row) * 100
+		END AS gdp_year_percentage
 	FROM
 		(SELECT 
-			tmmpssf.country,
-			lag(tmmpssf.country)
-				OVER (PARTITION BY tmmpssf.country ORDER BY tmmpssf.country, tmmpssf.year) AS country_prev_row,
 			tmmpssf.YEAR,
-			tmmpssf.gdp,
-			lag(tmmpssf.gdp)
-				OVER (PARTITION BY tmmpssf.country ORDER BY tmmpssf.country, tmmpssf.year) AS gdp_prev_row
+			avg(tmmpssf.gdp) AS avg_gdp,
+			lag(avg(tmmpssf.gdp))
+				OVER (PARTITION BY tmmpssf.country 
+					ORDER BY tmmpssf.country, tmmpssf.year) AS avg_gdp_prev_row
 		FROM t_martin_mrazek_project_sql_secondary_final tmmpssf
-		ORDER BY tmmpssf.country, tmmpssf.YEAR) AS rt1) AS rt2
-	GROUP BY rt2.YEAR);
+		GROUP BY tmmpssf.YEAR) AS rt1) AS rt2);
 	
 /* Question 5 (VIEW 2) */
 
 CREATE OR REPLACE VIEW v_martin_mrazek_task_5_prices AS 
 (SELECT 
 	rt3.entry_year,
-	round((rt3.avg_price_value_in_year), 2) AS avg_price_value_in_year,
-	concat(round((rt3.year_percentage_increase), 2), ' %') AS price_year_percentage_increase
-FROM
+	round((rt3.avg_value_in_year), 2) AS avg_price_value_in_year,
+	concat(round((rt3.year_on_year_percentage), 2), ' %') AS price_year_percentage_increase
+FROM 
 	(SELECT 
 		*,
 		CASE 
 			WHEN rt2.avg_value_in_year_prev_row IS NULL THEN 0
-			ELSE ((rt2.avg_price_value_in_year - rt2.avg_value_in_year_prev_row) / rt2.avg_value_in_year_prev_row) * 100
-		END AS year_percentage_increase		
+			ELSE ((rt2.avg_value_in_year - rt2.avg_value_in_year_prev_row) / rt2.avg_value_in_year_prev_row) * 100
+		END AS year_on_year_percentage
 	FROM 
 		(SELECT 
-			avg(rt1.avg_value_in_year_period) AS avg_price_value_in_year,
-			lag(avg(rt1.avg_value_in_year_period))
-				OVER (PARTITION BY rt1.name ORDER BY rt1.entry_year) AS avg_value_in_year_prev_row,
-			rt1.entry_year
+			rt1.entry_year,
+			avg(rt1.avg_value_in_year) AS avg_value_in_year,
+			avg(rt1.avg_value_in_year_prev_row) AS avg_value_in_year_prev_row
 		FROM 
 			(SELECT 
 				vmmt4.category_code,
 				vmmt4.cpc_name AS name,
-				avg(vmmt4.cprice_value) AS avg_value_in_year_period,
+				avg(vmmt4.cprice_value) AS avg_value_in_year,
+				lag(avg(vmmt4.cprice_value))
+					OVER (PARTITION BY vmmt4.category_code 
+						ORDER BY vmmt4.entry_year) AS avg_value_in_year_prev_row,
 				vmmt4.entry_year
 			FROM v_martin_mrazek_task_4 vmmt4
-			GROUP BY vmmt4.category_code, vmmt4.entry_year
-			ORDER BY vmmt4.category_code, vmmt4.entry_year) AS rt1
+			GROUP BY vmmt4.category_code, vmmt4.entry_year) AS rt1
 			GROUP BY rt1.entry_year) AS rt2) AS rt3);
 
 /* Question 5 (VIEW 3) */
@@ -318,7 +299,7 @@ CREATE OR REPLACE VIEW v_martin_mrazek_task_5_wages AS
 	rt2.payroll_year,
 	round((rt2.avg_wage_in_year), 2) AS avg_wage_in_year,
 	concat(round((rt2.wage_percentage_increase), 2), ' %') AS wage_year_percentage_increase
-FROM 
+FROM
 	(SELECT 
 		*,
 		CASE 
@@ -327,11 +308,12 @@ FROM
 			ELSE ((rt1.avg_wage_in_year - rt1.avg_wage_in_year_prev_row) / rt1.avg_wage_in_year_prev_row) * 100
 		END AS wage_percentage_increase
 	FROM
-		(SELECT 
+		(SELECT
 			vmmt1.payroll_year,
-			round(avg(vmmt1.cpayroll_value), 2) AS avg_wage_in_year,
-			lag(round(avg(vmmt1.cpayroll_value), 2))
-				OVER (ORDER BY vmmt1.payroll_year) AS avg_wage_in_year_prev_row
+			avg(vmmt1.cpayroll_value) AS avg_wage_in_year,
+			lag(avg(vmmt1.cpayroll_value)) 
+				OVER (PARTITION BY vmmt1.industry_branch_code 
+					ORDER BY vmmt1.payroll_year) AS avg_wage_in_year_prev_row
 		FROM v_martin_mrazek_task_1 vmmt1
 		GROUP BY vmmt1.payroll_year) AS rt1) AS rt2);
 
