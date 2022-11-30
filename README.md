@@ -2,10 +2,9 @@
 
 ### 1. Rostou v průběhu let mzdy ve všech odvětvích, nebo v některých klesají?
 
-  <sup>Hodnoty mezd jsou nejprve seskupeny podle odvětví, let a jednotlivých dnů za jednotlivá čtvrtletí v každém roce, kde pro každou uvedenou skupinu jsou hodnoty zprůměrovány pomocí agregační funkce ```avg()```.</sup>
-  <sup>Následně je celé období rozděleno na 2 poloviny (2006 - 2012 a 2012 - 2018, kde první polovina roku 2012 patří prvnímu období, a ta druhá druhému období).</sup>
-  <sup>Poté jsou data znovu seskupena podle jednotlivých odvětví a obou období, kde hodnoty mezd v každém odvětví a období jsou zprůměrovány opět pomocí agregační funkce ```avg()```.</sup>
-  <sup>Dle výsledků celého dotazu pak můžeme vidět průměr mezd v každém odvětví za obě období. V případě, že průměrná mzda ve druhém období (2012 - 2018) je v daném odvětví vyšší, než průměrná mzda v tom prvním období, pak je zřejmé, že mzdy v tomto odvětví v průběhu let rostou.</sup>
+  <sup>Nejprve je vypočítán průměr všech mezd pro každé odvětví za jednotlivé roky a čtvrtletí v dostupných letech.</sup>
+  <sup>Následně je vypočítán průmer mezd v každém roce pro všechna odvětví zvlášť.</sup>
+  <sup>Z výsledného dotazu můžeme vidět průměrnou mzdu v každém roce pro všechna jednotlivá odvětví.</sup> 
   
 - Odpověď: Mzdy rostou v průběhu let ve všech odvětvích.
 
@@ -28,11 +27,11 @@
     
 ### 3. Která kategorie potravin zdražuje nejpomaleji (je u ní nejnižší percentuální meziroční nárůst)?
 
-   <sup>Nejprve je vypočítán percentuální nárust cen všech kategoríí potravin pro každý rok (jednotlivé měsíce a dny).</sup>
-   <sup>Následně jsou tyto hodnoty sečteny v každém roce pro jednotlivé kategorie.</sup>
-   <sup>Jako poslední krok jsou sečtené hodnoty zprůměrovány v každém roce pro všechny kategorie potravin pomocí agregační funkce ```avg()```, kde vybereme pouze první hodnotu ze vzestupně seřazených dat podle sloupce z výslednými hodnotami. Z výsledku vidíme kategorii '118101' (Cukr krystalový), který nemá nárust ceny v průběhu let, nýbrž pokles průměrně o 1,75 % ročně.</sup>
+   <sup>Nejprve je vypočítán průměr ceny všech kategorií za všechny jednotlivé roky zvlášť.</sup>
+   <sup>Následně je vypočítán percentuální nárust v každém roce pro všechny dostupné kategorie.</sup>
+   <sup>Jako poslední krok jsou hodnoty percentuálního nárustu zprůměrovány pro všechny jednotlivé kategorie potravin pomocí agregační funkce ```avg()```, kde vybereme pouze první hodnotu ze vzestupně seřazených dat podle sloupce z výslednými hodnotami. Z výsledku vidíme kategorii '118101' (Cukr krystalový), který nemá nárust ceny v průběhu let, nýbrž pokles průměrně o 1,77 % ročně.</sup>
 
-- Odpověď: Nejméně zdražuje kategorie potravin '118101' (Cukr krystalový). Z výsledného dotazu je zřejmé, že cena této kategorie průměrně za 1 rok klesne o 1,75 %. Od roku 2006 do roku 2018 z původních 21,68 Kč/1Kg postupně rostla/klesala cena na konečných 15,75 Kč/1Kg (21,68 Kč - průměrná cena za 1 kg v roce 2006, 15,75 Kč - průměrná cena za 1 kg v roce 2018).
+- Odpověď: Nejméně zdražuje kategorie potravin '118101' (Cukr krystalový). Z výsledného dotazu je zřejmé, že cena této kategorie nemá meziroční nárust, nýbrž průměrný meziroční pokles o 1,77 %. Od roku 2006 do roku 2018 z původních 21,63 Kč/1Kg postupně rostla/klesala cena na konečných 15,65 Kč/1Kg (21,63 Kč - průměrná cena za 1 kg v roce 2006, 15,65 Kč - průměrná cena za 1 kg v roce 2018).
 
 ### 4. Existuje rok, ve kterém byl meziroční nárůst cen potravin výrazně vyšší než růst mezd (větší než 10 %)?
 
@@ -44,11 +43,11 @@
 
 ### 5. Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách ve stejném nebo násdujícím roce výraznějším růstem?
 
-   <sup>Nejprve je vypočítán percentuální nárust HDP pro všechny evropské státy v jednotlivých letech.</sup>
-   <sup>Následně jsou tyto hodnoty zprůměrovány pomocí agregační funkce ```avg()``` a seskupeny podle stejných let.</sup>
+   <sup>Nejprve je vypočítán průměr míry HDP pro všechny evropské státy v jednotlivých letech.</sup>
+   <sup>Následně je vypočítán percentuální nárust pro všechny jednotlivé roky.</sup>
+   <sup>Stejným způsobem je vypočítán nárust mezd. Růst cen potravin je vypočítán stejným způsobem jako v předchozí otázce (otázka 4).</sup>
    <sup>Z výsledného dotazu pak můžeme vidět, o kolik % se zvýšila (nebo snížila) míra HDP v každém roce.</sup>
-   <sup>Stejným způsobem je vypočítán nárust cen potravin a mezd v každém roce, kde jejich procentní navýšení, nebo pokles můžeme vidět ve stejném výsledku (výsledném dotazu) jako míru HDP.</sup>
 
-- Odpověď: Míra HDP nejvýrazněji vzrostla v roce 2008, kdy její nárust oproti minulému roku byl o 7,5 %. Ceny potravin ve stejném roce vzrostly o 6,19 %, další rok (2009) pak klesly o 6,41 %. Mzdy ve stejném roce vzrostly o 7,87 %, další rok (2009) pak vzrostly o 3,16 %. Ceny potravin nejvýrazněji vzrostly v roce 2017, kdy její nárust byl oproti minulému roku o 9,63 %. Tento rok nárust HDP byl pouze o 3,8 %. Nejvyšší nárust mezd byl zaznamenaný právě v roce 2008.
+- Odpověď: Míra HDP nejvýrazněji vzrostla v roce 2011, kdy její nárust oproti minulému roku byl o 6,77 %. Ceny potravin ve stejném roce vzrostly o 3,35 %, další rok (2012) pak klesly o 6,73 %. Mzdy ve stejném roce vzrostly o 2,30 %, další rok (2012) pak vzrostly o 3,03 %. Ceny potravin nejvýrazněji vzrostly v roce 2017, kdy její nárust byl oproti minulému roku o 9,63 %. Tento rok nárust HDP byl pouze o 2,53 %. Nejvyšší nárust mezd byl zaznamenaný v roce 2008.
 
-- Jestliže míra HDP vzroste výrazněji v jednom roce, pak se to projeví výrazněji na růstu mezd ve stejném roce.
+- Jestliže míra HDP vzroste výrazněji v jednom roce, pak se to projeví výrazněji na růstu potravin v následujícím roce.
