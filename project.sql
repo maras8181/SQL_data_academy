@@ -49,11 +49,7 @@ FROM countries c
 JOIN economies e 
 	ON c.country = e.country
 WHERE c.continent = 'Europe'
-AND e.YEAR IN
-	(SELECT 
-		DISTINCT tmm.entry_year
-	FROM t_martin_mrazek_project_sql_primary_final tmm
-	ORDER BY tmm.entry_year));
+AND e.YEAR BETWEEN 2006 AND 2018);
 
 /* INDEXES */
 
@@ -68,27 +64,24 @@ CREATE OR REPLACE INDEX i_payroll_quarter ON t_martin_mrazek_project_SQL_primary
 
 /* 1. Rostou v průběhu let mzdy ve všech odvětvích, nebo v některých klesají? */
 
-/* Question 1 (VIEW 1) */
-
-CREATE OR REPLACE VIEW v_martin_mrazek_task_1 AS 
-(SELECT 
-	DISTINCT tmm.cpayroll_id,
-	tmm.industry_branch_code,
-	tmm.cpib_name,
-	tmm.cpayroll_value,
-	tmm.payroll_year,
-	tmm.payroll_quarter
-FROM t_martin_mrazek_project_sql_primary_final tmm
-ORDER BY tmm.industry_branch_code, tmm.payroll_year);
-
 /* Question 1 (FINAL QUERY) */
 
+WITH v_martin_mrazek_task_1 AS 
+	(SELECT 
+		DISTINCT tmm.cpayroll_id,
+		tmm.industry_branch_code,
+		tmm.cpib_name,
+		tmm.cpayroll_value,
+		tmm.payroll_year,
+		tmm.payroll_quarter
+	FROM t_martin_mrazek_project_sql_primary_final tmm
+	ORDER BY tmm.industry_branch_code, tmm.payroll_year)
 SELECT 
 	rt1.industry_branch_code,
 	rt1.cpib_name AS name,
 	round(avg(rt1.avg_value_in_year_quarter), 2) AS avg_value_in_year,
 	rt1.payroll_year
-FROM 
+FROM
 	(SELECT 
 		vmmt1.industry_branch_code,vmmt1.cpib_name,
 		avg(vmmt1.cpayroll_value) AS avg_value_in_year_quarter,
@@ -114,7 +107,7 @@ CREATE OR REPLACE VIEW v_martin_mrazek_task_2_avg_prices AS
 	tmm2.price_unit
 FROM t_martin_mrazek_project_sql_primary_final tmm2
 WHERE tmm2.date_from IN ('2006-01-02', '2018-12-10')
-AND tmm2.category_code IN (111301, 114201)
+	AND tmm2.category_code IN (111301, 114201)
 GROUP BY tmm2.category_code, tmm2.date_from);
 
 /* Question 2 (VIEW 2) */
@@ -126,7 +119,7 @@ CREATE OR REPLACE VIEW v_martin_mrazek_task_2_avg_wages AS
 	tmm2.date_from
 FROM t_martin_mrazek_project_sql_primary_final tmm2
 WHERE tmm2.date_from = '2006-01-02' AND tmm2.payroll_quarter = 1
-OR tmm2.date_from = '2018-12-10' AND tmm2.payroll_quarter = 4
+	OR tmm2.date_from = '2018-12-10' AND tmm2.payroll_quarter = 4
 GROUP BY tmm2.date_from);
 
 /* Question 2 (FINAL QUERY) */
@@ -147,20 +140,17 @@ JOIN v_martin_mrazek_task_2_avg_wages vmmt2aw
 		
 /* 3. Která kategorie potravin zdražuje nejpomaleji (je u ní nejnižší percentuální meziroční nárůst)? */
 	
-/* Question 3 (VIEW 1) */
-	
-CREATE OR REPLACE VIEW v_martin_mrazek_task_3 AS 
-(SELECT 
-	DISTINCT tmm.category_code,
-	tmm.cpc_name,
-	tmm.cprice_value,
-	tmm.entry_month,
-	tmm.entry_year
-FROM t_martin_mrazek_project_SQL_primary_final tmm
-ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month);
-
 /* Question 3 (FINAL QUERY) */
 
+WITH v_martin_mrazek_task_3 AS 
+	(SELECT 
+		DISTINCT tmm.category_code,
+		tmm.cpc_name,
+		tmm.cprice_value,
+		tmm.entry_month,
+		tmm.entry_year
+	FROM t_martin_mrazek_project_SQL_primary_final tmm
+	ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month)
 SELECT 
 	rt2.category_code,
 	rt2.name,
@@ -189,21 +179,18 @@ FROM
 
 /* 4. Existuje rok, ve kterém byl meziroční nárůst cen potravin výrazně vyšší než růst mezd (větší než 10 %)? */
 
-/* Question 4 (VIEW 1) */
-
-CREATE OR REPLACE VIEW v_martin_mrazek_task_4 AS 
-(SELECT 
-	DISTINCT tmm.cprice_id,
-	tmm.category_code,
-	tmm.cpc_name,
-	tmm.cprice_value,
-	tmm.entry_month,
-	tmm.entry_year 
-FROM t_martin_mrazek_project_sql_primary_final tmm
-ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month);
-
 /* Question 4 (FINAL QUERY) */
 
+WITH v_martin_mrazek_task_4 AS
+	(SELECT 
+		DISTINCT tmm.cprice_id,
+		tmm.category_code,
+		tmm.cpc_name,
+		tmm.cprice_value,
+		tmm.entry_month,
+		tmm.entry_year 
+	FROM t_martin_mrazek_project_sql_primary_final tmm
+	ORDER BY tmm.category_code, tmm.entry_year, tmm.entry_month)
 SELECT 
 	rt3.entry_year AS YEAR,
 	round((rt3.avg_value_in_year), 2) AS avg_price_value_in_year,
