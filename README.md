@@ -48,6 +48,6 @@
    <sup>Stejným způsobem je vypočítán nárust mezd. Růst cen potravin je vypočítán stejným způsobem jako v předchozí otázce (otázka 4).</sup>
    <sup>Z výsledného dotazu pak můžeme vidět, o kolik % se zvýšila (nebo snížila) míra HDP v každém roce.</sup>
 
-- Odpověď: Míra HDP nejvýrazněji vzrostla v roce 2011, kdy její nárust oproti minulému roku byl o 6,77 %. Ceny potravin ve stejném roce vzrostly o 3,35 %, další rok (2012) pak klesly o 6,73 %. Mzdy ve stejném roce vzrostly o 2,30 %, další rok (2012) pak vzrostly o 3,03 %. Ceny potravin nejvýrazněji vzrostly v roce 2017, kdy její nárust byl oproti minulému roku o 9,63 %. Tento rok nárust HDP byl pouze o 2,53 %. Nejvyšší nárust mezd byl zaznamenaný v roce 2008.
+- Odpověď: Míra HDP nejvýrazněji vzrostla v roce 2011, kdy její nárust oproti minulému roku byl o 6,77 %. Ceny potravin ve stejném roce vzrostly o 3,35 %, další rok (2012) pak klesly o 6,73 %. Mzdy ve stejném roce vzrostly o 2,30 %, další rok (2012) pak vzrostly o 3,03 %. Ceny potravin nejvýrazněji vzrostly v roce 2017, kdy její nárust byl oproti minulému roku o 9,63 %. Tento rok nárust HDP byl pouze o 2,53 %. Nejvyšší nárust mezd byl zaznamenaný v roce 2008 (7,87 %). Míra HDP tento rok vzrostla o 0,98 %.
 
 - Jestliže míra HDP vzroste výrazněji v jednom roce, pak se to projeví výrazněji na růstu potravin v následujícím roce.
