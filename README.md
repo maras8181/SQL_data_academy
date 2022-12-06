@@ -2,9 +2,9 @@
 
 ### 1. Rostou v průběhu let mzdy ve všech odvětvích, nebo v některých klesají?
 
-  <sup>Nejprve je vypočítán průměr všech mezd pro každé odvětví za jednotlivé roky a čtvrtletí v dostupných letech.</sup>
-  <sup>Následně je vypočítán průmer mezd v každém roce pro všechna odvětví zvlášť.</sup>
-  <sup>Z výsledného dotazu můžeme vidět průměrnou mzdu v každém roce pro všechna jednotlivá odvětví.</sup> 
+  <sup>Nejprve je vypočítán průměr všech mezd pro každé odvětví za jednotlivé roky v dostupných letech.</sup>
+  <sup>ZNásledně můžeme z dotazu vidět průměrnou mzdu v každém roce pro všechna jednotlivá odvětví.</sup>
+  <sup>Z něj pak můžeme odvodit, zda průměrná mzda v daném odvětví za jednotlivé roky klesá nebo roste.</sup>
   
 - Odpověď: Mzdy rostou v průběhu let ve všech odvětvích.
 
