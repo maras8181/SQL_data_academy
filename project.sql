@@ -67,27 +67,27 @@ CREATE OR REPLACE INDEX i_payroll_quarter ON t_martin_mrazek_project_SQL_primary
 /* Question 1 (FINAL QUERY) */
 
 SELECT 
-	rt.name, 
-	rt.avg_value, 
-	LAG(rt.avg_value) 
-		OVER (PARTITION BY rt.name 
-			ORDER BY rt.name, rt.payroll_year) AS prev_year_avg_value, 
+	rt1.name, 
+	rt1.avg_value, 
+	LAG(rt1.avg_value) 
+		OVER (PARTITION BY rt1.name 
+			ORDER BY rt1.name, rt1.payroll_year) AS prev_year_avg_value, 
 	CASE
-		WHEN LAG(rt.avg_value) 
-			OVER (PARTITION BY rt.name 
-				ORDER BY rt.name, rt.payroll_year) <= rt.avg_value THEN 'increase'
-		WHEN LAG(rt.avg_value) 
-			OVER (PARTITION BY rt.name 
-				ORDER BY rt.name, rt.payroll_year) > rt.avg_value THEN 'decrease' 
+		WHEN LAG(rt1.avg_value) 
+			OVER (PARTITION BY rt1.name 
+				ORDER BY rt1.name, rt1.payroll_year) <= rt1.avg_value THEN 'increase'
+		WHEN LAG(rt1.avg_value) 
+			OVER (PARTITION BY rt1.name 
+				ORDER BY rt1.name, rt1.payroll_year) > rt1.avg_value THEN 'decrease' 
 	END AS salary_status, 
-	rt.payroll_year 
+	rt1.payroll_year 
 FROM 
 	(SELECT 
 		pf.cpib_name AS name, 
 		AVG(pf.cpayroll_value) AS avg_value, 
 		pf.payroll_year 
 	FROM t_martin_mrazek_project_sql_primary_final pf 
-	GROUP BY pf.cpib_name, pf.payroll_year) AS rt;
+	GROUP BY pf.cpib_name, pf.payroll_year) AS rt1;
 	
 /* 2. Kolik je možné si koupit litrů mléka a kilogramů chleba za první a poslední srovnatelné období v dostupných datech cen a mezd? */
 
@@ -182,7 +182,7 @@ FROM
 			ELSE ((rt2.avg_value_in_year - rt2.avg_value_in_year_prev_row) / rt2.avg_value_in_year_prev_row) * 100
 		END AS year_on_year_percentage
 	FROM
-		(SELECT 
+		(SELECT
 			rt1.entry_year,
 			AVG(rt1.avg_value_in_year) AS avg_value_in_year,
 			AVG(rt1.avg_value_in_year_prev_row) AS avg_value_in_year_prev_row
@@ -195,7 +195,7 @@ FROM
 					OVER (PARTITION BY pf.category_code 
 						ORDER BY pf.entry_year) AS avg_value_in_year_prev_row,
 				pf.entry_month,
-				pf.entry_year 
+				pf.entry_year
 			FROM t_martin_mrazek_project_sql_primary_final pf
 			GROUP BY pf.category_code, pf.entry_year) AS rt1
 		GROUP BY rt1.entry_year) AS rt2) AS rt3;
@@ -206,19 +206,19 @@ FROM
 /* Question 5 (VIEW 1) */
 	
 CREATE OR REPLACE VIEW v_martin_mrazek_task_5_gdp AS 
-(SELECT 
+(SELECT
 	rt2.YEAR,
 	rt2.avg_gdp,
 	CONCAT(ROUND((rt2.gdp_year_percentage), 2), ' %') AS gdp_year_percentage_increase
 FROM
-	(SELECT 
+	(SELECT
 		*,
-		CASE 
+		CASE
 			WHEN rt1.avg_gdp_prev_row IS NULL THEN 0
 			ELSE ((rt1.avg_gdp - rt1.avg_gdp_prev_row) / rt1.avg_gdp_prev_row) * 100
 		END AS gdp_year_percentage
 	FROM
-		(SELECT 
+		(SELECT
 			sf.YEAR,
 			AVG(sf.gdp) AS avg_gdp,
 			LAG(AVG(sf.gdp))
@@ -230,14 +230,14 @@ FROM
 /* Question 5 (VIEW 2) */
 
 CREATE OR REPLACE VIEW v_martin_mrazek_task_5_prices AS 
-(SELECT 
+(SELECT
 	rt3.entry_year,
 	ROUND((rt3.avg_value_in_year), 2) AS avg_price_value_in_year,
 	CONCAT(ROUND((rt3.year_on_year_percentage), 2), ' %') AS price_year_percentage_increase
 FROM
-	(SELECT 
+	(SELECT
 		*,
-		CASE 
+		CASE
 			WHEN rt2.avg_value_in_year_prev_row IS NULL THEN 0
 			ELSE ((rt2.avg_value_in_year - rt2.avg_value_in_year_prev_row) / rt2.avg_value_in_year_prev_row) * 100
 		END AS year_on_year_percentage
@@ -255,7 +255,7 @@ FROM
 					OVER (PARTITION BY pf.category_code 
 						ORDER BY pf.entry_year) AS avg_value_in_year_prev_row,
 				pf.entry_month,
-				pf.entry_year 
+				pf.entry_year
 			FROM t_martin_mrazek_project_sql_primary_final pf
 			GROUP BY pf.category_code, pf.entry_year) AS rt1
 		GROUP BY rt1.entry_year) AS rt2) AS rt3);
@@ -263,42 +263,42 @@ FROM
 /* Question 5 (VIEW 3) */
 
 CREATE OR REPLACE VIEW v_martin_mrazek_task_5_wages AS 
-(SELECT 
+(SELECT
 	rt3.payroll_year,
 	ROUND((rt3.avg_wage_in_year), 2) AS avg_wage_in_year,
 	CONCAT(ROUND((rt3.wage_percentage_increase), 2), ' %') AS wage_year_percentage_increase
 FROM
-	(SELECT 
+	(SELECT
 		*,
-		CASE 
+		CASE
 			WHEN rt2.avg_wage_in_year_prev_row IS NULL THEN 0
 			ELSE ((rt2.avg_wage_in_year - rt2.avg_wage_in_year_prev_row) / rt2.avg_wage_in_year_prev_row) * 100
 		END AS wage_percentage_increase
-	FROM	
+	FROM
 		(SELECT
 			rt1.payroll_year,
 			AVG(rt1.avg_wage_in_year) AS avg_wage_in_year,
 			AVG(rt1.avg_wage_in_year_prev_row) AS avg_wage_in_year_prev_row
-		FROM 
+		FROM
 			(SELECT
 				pf.cpib_name,
 				pf.payroll_year,
 				AVG(pf.cpayroll_value) AS avg_wage_in_year,
 				LAG(AVG(pf.cpayroll_value))
-					OVER (PARTITION BY pf.cpib_name 
+					OVER (PARTITION BY pf.cpib_name
 						ORDER BY pf.payroll_year) AS avg_wage_in_year_prev_row
 			FROM t_martin_mrazek_project_sql_primary_final pf
 			GROUP BY pf.cpib_name, pf.payroll_year) AS rt1
 		GROUP BY rt1.payroll_year) AS rt2) AS rt3);
 
 /* Question 5 (FINAL QUERY) */
-		
-SELECT 
+
+SELECT
 	vmmt5g.*,
 	vmmt5p.avg_price_value_in_year,
 	vmmt5p.price_year_percentage_increase,
 	vmmt5w.avg_wage_in_year,
-	vmmt5w.wage_year_percentage_increase 
+	vmmt5w.wage_year_percentage_increase
 FROM v_martin_mrazek_task_5_gdp vmmt5g
 JOIN v_martin_mrazek_task_5_prices vmmt5p
 	ON vmmt5g.YEAR = vmmt5p.entry_year
