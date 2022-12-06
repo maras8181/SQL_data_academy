@@ -68,8 +68,8 @@ CREATE OR REPLACE INDEX i_payroll_quarter ON t_martin_mrazek_project_SQL_primary
 
 SELECT 
 	rt1.name, 
-	rt1.avg_value, 
-	LAG(rt1.avg_value) 
+	ROUND((rt1.avg_value), 2) AS avg_value, 
+	LAG(ROUND((rt1.avg_value), 2))
 		OVER (PARTITION BY rt1.name 
 			ORDER BY rt1.name, rt1.payroll_year) AS prev_year_avg_value, 
 	CASE
